@@ -31,6 +31,10 @@ def test_database_crud_and_idempotency(temp_db):
         retroatividade="3 anos",
         territorio="Brasil",
         legislacao_aplicavel="Brasileira",
+        cod_ramo="0378",
+        ramo_descricao="Responsabilidade Civil D&O",
+        tipo_movimento="101",
+        tipo_movimento_descricao="Emissão de Apólice",
         metodo_extracao="pdfplumber",
         confianca_extracao=1.0
     )
@@ -46,11 +50,15 @@ def test_database_crud_and_idempotency(temp_db):
     apolices = temp_db.list_apolices()
     assert len(apolices) == 1
     assert apolices[0].premio_total == "R$ 105.000,00"
+    assert apolices[0].cod_ramo == "0378"
+    assert apolices[0].tipo_movimento == "101"
 
     # 3. Consulta individual
     recovered = temp_db.get_apolice_by_id("hash_md5_teste_1")
     assert recovered is not None
     assert recovered.seguradora == "Allianz"
+    assert recovered.cod_ramo == "0378"
+    assert recovered.tipo_movimento == "101"
     assert len(recovered.coberturas) == 3
 
     # 4. Exclusão

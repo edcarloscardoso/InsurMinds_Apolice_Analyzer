@@ -21,7 +21,9 @@ def create_policy_pdf(
     territorio: str,
     coberturas: list[str],
     exclusoes: list[str],
-    clausulas_especiais: list[str]
+    clausulas_especiais: list[str],
+    cod_ramo: str = "0378 - Responsabilidade Civil D&O",
+    tipo_mov: str = "101 - Emissão de Apólice"
 ):
     """Gera um documento PDF profissional de apólice de seguro D&O."""
     doc = SimpleDocTemplate(
@@ -78,13 +80,16 @@ def create_policy_pdf(
 
     # Cabeçalho da Apólice
     story.append(Paragraph(f"<b>{seguradora.upper()}</b>", title_style))
-    story.append(Paragraph("APÓLICE DE SEGURO DE RESPONSABILIDADE CIVIL DE DIRETORES E ADMINISTRADORES (D&O)", subtitle_style))
+    doc_type_title = "APÓLICE DE SEGURO DE RESPONSABILIDADE CIVIL DE DIRETORES E ADMINISTRADORES (D&O)" if "101" in tipo_mov else "ENDOSSO DE SEGURO D&O - ALTERAÇÃO CONTRATUAL"
+    story.append(Paragraph(doc_type_title, subtitle_style))
     story.append(HRFlowable(width="100%", thickness=2, color=accent_color, spaceAfter=12))
 
     # Tabela de Dados Gerais
     dados_gerais = [
         [Paragraph("<b>Tomador / Segurado:</b>", body_style), Paragraph(segurado, body_style)],
         [Paragraph("<b>Apólice Nº:</b>", body_style), Paragraph(num_apolice, body_style)],
+        [Paragraph("<b>Ramo SUSEP:</b>", body_style), Paragraph(cod_ramo, body_style)],
+        [Paragraph("<b>Tipo de Movimento:</b>", body_style), Paragraph(tipo_mov, body_style)],
         [Paragraph("<b>Período de Vigência:</b>", body_style), Paragraph(vigencia, body_style)],
         [Paragraph("<b>Limite Máximo de Garantia (LMG):</b>", body_style), Paragraph(f"<b>{lmg}</b>", body_style)],
         [Paragraph("<b>Franquia / Retenção:</b>", body_style), Paragraph(franquia, body_style)],
@@ -255,6 +260,39 @@ def generate_all_samples():
             "Garantia de Manutenção de Defesa em Casos de Insolvência da Empresa",
             "Cláusula de Severabilidade de Conduta entre Segurados",
             "Indenização por Danos Morais Decorrentes de Gestão Corporativa"
+        ]
+    )
+
+    # 4. Allianz D&O (Endosso de Cobrança Adicional - Tipo Mov 102)
+    create_policy_pdf(
+        output_path=base_dir / "apolice_do_allianz_endosso.pdf",
+        seguradora="Allianz Global Corporate & Specialty Resseguros Brasil S.A.",
+        segurado="TechCorp Brasil Inovações e Soluções Tecnológicas S.A.",
+        num_apolice="01.0775.000458/01 - Endosso 01",
+        vigencia="01/01/2026 a 01/01/2027",
+        premio="R$ 18.500,00 (Prêmio Adicional do Endosso)",
+        lmg="R$ 12.000.000,00 (Limite Ampliado)",
+        franquia="R$ 50.000,00",
+        retroatividade="01/01/2023 (3 anos de retroatividade)",
+        territorio="Brasil e Jurisdição Mundial (exceto EUA e Canadá)",
+        cod_ramo="0378 - Responsabilidade Civil D&O",
+        tipo_mov="102 - Endosso de cobrança adicional de prêmio",
+        coberturas=[
+            "Cobertura Side A (Indivíduos não indenizados pela sociedade)",
+            "Cobertura Side B (Reembolso da Sociedade)",
+            "Extensão de Cobertura para Novas Subsidiárias Adquiridas no Exterior",
+            "Custos de Defesa e Honorários Advocatícios Antecipados",
+            "Custos de Investigação Regulatória (CVM, BACEN, CADE)"
+        ],
+        exclusoes=[
+            "Atos dolosos, fraude comprovada ou conduta criminal transitada em julgado",
+            "Obtenção de lucro ou vantagem financeira indevida",
+            "Danos corporais, morte e danos materiais diretos",
+            "Reclamações anteriores ou fatos conhecidos antes da data de retroatividade"
+        ],
+        clausulas_especiais=[
+            "Endosso de Inclusão de Subsidiária Latino-Americana",
+            "Acréscimo de LMG em R$ 2.000.000,00 mediante prêmio fracionado"
         ]
     )
 

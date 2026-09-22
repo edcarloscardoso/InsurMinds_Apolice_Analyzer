@@ -13,10 +13,11 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 DATA_DIR = BASE_DIR / "data"
 UPLOADS_DIR = DATA_DIR / "uploads"
 SAMPLE_POLICIES_DIR = DATA_DIR / "sample_policies"
+DRIVE_POLICIES_DIR = DATA_DIR / "drive_policies"
 ARTEFATOS_DIR = BASE_DIR / "Projeto_Final_Artefatos"
 
 # Garante a existência dos diretórios fundamentais
-for directory in [DATA_DIR, UPLOADS_DIR, SAMPLE_POLICIES_DIR, ARTEFATOS_DIR]:
+for directory in [DATA_DIR, UPLOADS_DIR, SAMPLE_POLICIES_DIR, DRIVE_POLICIES_DIR, ARTEFATOS_DIR]:
     directory.mkdir(parents=True, exist_ok=True)
 
 # Parâmetros de Ingestão e Segurança
@@ -34,5 +35,5 @@ GEMINI_VISION_MODEL = os.getenv("GEMINI_VISION_MODEL", "gemini-2.0-flash")
 
 # Configurações do Servidor e Logging
 LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO")
-SERVER_ADDRESS = os.getenv("SERVER_ADDRESS", "127.0.0.1")
-SERVER_PORT = int(os.getenv("SERVER_PORT", "8501"))
+SERVER_ADDRESS = os.getenv("SERVER_ADDRESS", "0.0.0.0")
+SERVER_PORT = int(os.getenv("SERVER_PORT", "8503"))

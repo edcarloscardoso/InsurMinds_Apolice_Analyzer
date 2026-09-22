@@ -10,6 +10,7 @@ from ui.page_upload import render_upload_page
 from ui.page_library import render_library_page
 from ui.page_compare import render_compare_page
 from ui.page_report import render_report_page
+from ui.page_accounting import render_accounting_page
 
 # Configuração da página Streamlit
 st.set_page_config(
@@ -25,6 +26,8 @@ apply_custom_styles()
 # Inicialização de estado da sessão
 if "nav_page" not in st.session_state:
     st.session_state["nav_page"] = "Upload"
+if "nav_version" not in st.session_state:
+    st.session_state["nav_version"] = 0
 
 # Banner Superior Corporativo InsurMinds (Padrão Seguros & Resseguros)
 st.markdown("""
@@ -42,16 +45,18 @@ with st.sidebar:
     st.image("https://img.icons8.com/fluency/96/shield.png", width=64)
     st.markdown("### Navegação")
     
-    paginas = ["Upload", "Biblioteca", "Comparação", "Relatório"]
-    icones = {"Upload": "📤", "Biblioteca": "📚", "Comparação": "⚖️", "Relatório": "📄"}
+    paginas = ["Upload", "Biblioteca", "Comparação", "Relatório", "Auditoria Contábil"]
+    icones = {"Upload": "📤", "Biblioteca": "📚", "Comparação": "⚖️", "Relatório": "📄", "Auditoria Contábil": "📊"}
 
-    # Atualiza página caso tenha sido alterada programaticamente
-    current_index = paginas.index(st.session_state["nav_page"]) if st.session_state["nav_page"] in paginas else 0
+    current_page = st.session_state.get("nav_page", "Upload")
+    current_index = paginas.index(current_page) if current_page in paginas else 0
+    radio_key = f"nav_radio_{st.session_state.get('nav_version', 0)}"
 
     escolha = st.radio(
         "Selecione o módulo:",
         options=paginas,
         index=current_index,
+        key=radio_key,
         format_func=lambda x: f"{icones[x]} {x}"
     )
     if escolha != st.session_state["nav_page"]:
@@ -102,3 +107,5 @@ elif active_page == "Comparação":
     render_compare_page()
 elif active_page == "Relatório":
     render_report_page()
+elif active_page == "Auditoria Contábil":
+    render_accounting_page()

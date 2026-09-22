@@ -35,6 +35,12 @@ class ApoliceDAO(BaseModel):
     territorio: Optional[str] = Field(default=None, description="Abrangência territorial e jurisdicional")
     legislacao_aplicavel: Optional[str] = Field(default=None, description="Legislação, jurisdição e foro")
 
+    # Classificação Regulatória SUSEP
+    cod_ramo: Optional[str] = Field(default="0378", description="Código de 4 dígitos do ramo na SUSEP")
+    ramo_descricao: Optional[str] = Field(default="Responsabilidade Civil D&O", description="Descrição por extenso do ramo")
+    tipo_movimento: Optional[str] = Field(default="101", description="Código do tipo de movimento SUSEP (ex: 101, 102...)")
+    tipo_movimento_descricao: Optional[str] = Field(default="Emissão de Apólice", description="Descrição do tipo de movimento")
+
     # Auditoria de Extração
     metodo_extracao: str = Field(default="pdfplumber", description="'pdfplumber' | 'gemini_vision' | 'mock_fallback'")
     confianca_extracao: float = Field(default=1.0, ge=0.0, le=1.0, description="Nível de confiança da extração (0.0 a 1.0)")
@@ -99,3 +105,58 @@ class ComparisonState(BaseModel):
     report_markdown: str = ""
     status: str = "iniciado"
     errors: List[str] = Field(default_factory=list)
+
+
+# -----------------------------------------------------------------------------
+# Módulo de Auditoria Contábil & Variação de Sinistros (SUSEP)
+# -----------------------------------------------------------------------------
+
+class SinistroItem(BaseModel):
+    """Representa um registro de sinistro ou movimentação contábil para análise de variação."""
+    numero_sinistro: str = Field(..., description="Número identificador do sinistro")
+    numero_apolice: str = Field(..., description="Número da apólice vinculada")
+    segurado: str = Field(..., description="Razão social do segurado")
+    seguradora: str = Field(..., description="Companhia seguradora")
+    cod_ramo: str = Field(..., description="Código de 4 dígitos do ramo na SUSEP")
+    ramo_nome: str = Field(..., description="Nome descritivo do ramo")
+    tipo_mov: str = Field(default="101", description="Tipo de movimento SUSEP (ex: 101, 102...)")
+    saldo_anterior: float = Field(..., description="Saldo contábil anterior (PSL / Reserva em R$)")
+    saldo_atual: float = Field(..., description="Saldo contábil atualizado (PSL / Reserva em R$)")
+    delta_variacao: float = Field(..., description="Variação monetária (saldo_atual - saldo_anterior)")
+    delta_percentual: float = Field(default=0.0, description="Variação percentual")
+    status_sinistro: str = Field(default="Avisado", description="'Avisado' | 'Sob Regulação' | 'Liquidado' | 'Judicializado'")
+    causa_sinistro: str = Field(default="", description="Descrição do fato gerador / causa do sinistro")
+
+
+class RamoVarianceSummary(BaseModel):
+    """Consolidação da variação contábil agregada por Ramo SUSEP."""
+    cod_ramo: str = Field(..., description="Código do ramo SUSEP")
+    ramo_nome: str = Field(..., description="Nome descritivo do ramo")
+    qtd_sinistros: int = Field(default=0, description="Quantidade de sinistros ativos")
+    total_anterior: float = Field(..., description="Saldo agregado anterior em R$")
+    total_atual: float = Field(..., description="Saldo agregado atual em R$")
+    delta_absoluto: float = Field(..., description="Variação líquida do ramo em R$")
+    delta_percentual: float = Field(..., description="Variação percentual do ramo")
+    share_na_variacao_total: float = Field(default=0.0, description="Percentual de contribuição na variação global")
+    is_maior_ofensor: bool = Field(default=False, description="True se for o ramo com maior contribuição na variação")
+
+
+class AuditoriaVarianceReport(BaseModel):
+    """Relatório consolidado de auditoria contábil com justificativa técnica para SUSEP."""
+    periodo_referencia: str = Field(..., description="Mês/Ano de referência contábil (ex: 08/2026)")
+    total_anterior_geral: float = Field(..., description="Saldo total de provisão anterior")
+    total_atual_geral: float = Field(..., description="Saldo total de provisão atual")
+    delta_global: float = Field(..., description="Variação monetária total da carteira")
+    delta_global_percentual: float = Field(..., description="Variação percentual global")
+    
+    # Maiores Ofensores
+    ramo_maior_ofensor: Optional[RamoVarianceSummary] = Field(default=None, description="Ramo SUSEP que mais impactou a oscilação")
+    sinistro_maior_ofensor: Optional[SinistroItem] = Field(default=None, description="Sinistro individual com maior impacto na variação")
+    
+    # Resumos Agrupados
+    variacao_por_ramo: List[RamoVarianceSummary] = Field(default_factory=list, description="Lista de resumos por ramo SUSEP")
+    top_sinistros_ofensores: List[SinistroItem] = Field(default_factory=list, description="Top sinistros ofensores da carteira")
+    
+    # Parecer Textual Contábil
+    justificativa_auditoria_markdown: str = Field(default="", description="Nota explicativa técnica redigida para SUSEP e Auditoria")
+

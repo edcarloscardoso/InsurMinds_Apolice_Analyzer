@@ -51,6 +51,10 @@ class DatabaseManager:
                     retroatividade TEXT,
                     territorio TEXT,
                     legislacao_aplicavel TEXT,
+                    cod_ramo TEXT DEFAULT '0378',
+                    ramo_descricao TEXT DEFAULT 'Responsabilidade Civil D&O',
+                    tipo_movimento TEXT DEFAULT '101',
+                    tipo_movimento_descricao TEXT DEFAULT 'Emissão de Apólice',
                     metodo_extracao TEXT,
                     confianca_extracao REAL,
                     campos_nao_encontrados_json TEXT,
@@ -58,6 +62,19 @@ class DatabaseManager:
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                 )
             """)
+
+            # Migração automática idempotente para bases preexistentes
+            cursor.execute("PRAGMA table_info(apolices)")
+            colunas_existentes = {col[1] for col in cursor.fetchall()}
+            novas_colunas = [
+                ("cod_ramo", "TEXT DEFAULT '0378'"),
+                ("ramo_descricao", "TEXT DEFAULT 'Responsabilidade Civil D&O'"),
+                ("tipo_movimento", "TEXT DEFAULT '101'"),
+                ("tipo_movimento_descricao", "TEXT DEFAULT 'Emissão de Apólice'")
+            ]
+            for nome_col, tipo_col in novas_colunas:
+                if nome_col not in colunas_existentes:
+                    cursor.execute(f"ALTER TABLE apolices ADD COLUMN {nome_col} {tipo_col}")
 
             # Tabela de Comparações e Pareceres
             cursor.execute("""
@@ -78,6 +95,8 @@ class DatabaseManager:
             # Índices de performance
             cursor.execute("CREATE INDEX IF NOT EXISTS idx_apolices_seguradora ON apolices(seguradora)")
             cursor.execute("CREATE INDEX IF NOT EXISTS idx_apolices_segurado ON apolices(segurado)")
+            cursor.execute("CREATE INDEX IF NOT EXISTS idx_apolices_ramo ON apolices(cod_ramo)")
+            cursor.execute("CREATE INDEX IF NOT EXISTS idx_apolices_tipo_mov ON apolices(tipo_movimento)")
             cursor.execute("CREATE INDEX IF NOT EXISTS idx_comparacoes_pares ON comparacoes(apolice_a_id, apolice_b_id)")
             
             conn.commit()
@@ -96,9 +115,10 @@ class DatabaseManager:
                     id, nome_arquivo, data_processamento, segurado, seguradora, numero_apolice,
                     vigencia_inicio, vigencia_fim, premio_total, limite_responsabilidade, franquia,
                     coberturas_json, exclusoes_json, clausulas_especiais_json, retroatividade,
-                    territorio, legislacao_aplicavel, metodo_extracao, confianca_extracao,
+                    territorio, legislacao_aplicavel, cod_ramo, ramo_descricao, tipo_movimento,
+                    tipo_movimento_descricao, metodo_extracao, confianca_extracao,
                     campos_nao_encontrados_json, dados_completos_json
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 ON CONFLICT(id) DO UPDATE SET
                     nome_arquivo = excluded.nome_arquivo,
                     data_processamento = excluded.data_processamento,
@@ -116,6 +136,10 @@ class DatabaseManager:
                     retroatividade = excluded.retroatividade,
                     territorio = excluded.territorio,
                     legislacao_aplicavel = excluded.legislacao_aplicavel,
+                    cod_ramo = excluded.cod_ramo,
+                    ramo_descricao = excluded.ramo_descricao,
+                    tipo_movimento = excluded.tipo_movimento,
+                    tipo_movimento_descricao = excluded.tipo_movimento_descricao,
                     metodo_extracao = excluded.metodo_extracao,
                     confianca_extracao = excluded.confianca_extracao,
                     campos_nao_encontrados_json = excluded.campos_nao_encontrados_json,
@@ -138,6 +162,10 @@ class DatabaseManager:
                 dao.retroatividade,
                 dao.territorio,
                 dao.legislacao_aplicavel,
+                dao.cod_ramo or "0378",
+                dao.ramo_descricao or "Responsabilidade Civil D&O",
+                dao.tipo_movimento or "101",
+                dao.tipo_movimento_descricao or "Emissão de Apólice",
                 dao.metodo_extracao,
                 dao.confianca_extracao,
                 json.dumps(dao.campos_nao_encontrados, ensure_ascii=False),
@@ -165,12 +193,20 @@ class DatabaseManager:
             return [ApoliceDAO.model_validate_json(row["dados_completos_json"]) for row in rows]
 
     def delete_apolice(self, apolice_id: str) -> bool:
-        """Remove uma apólice do banco pelo seu ID."""
+        """Remove uma apólice do banco relacional."""
         with self._get_connection() as conn:
             cursor = conn.cursor()
             cursor.execute("DELETE FROM apolices WHERE id = ?", (apolice_id,))
             conn.commit()
             return cursor.rowcount > 0
+
+    def clear_database(self) -> None:
+        """Limpa todas as apólices e comparações do banco para reiniciar testes."""
+        with self._get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute("DELETE FROM comparacoes")
+            cursor.execute("DELETE FROM apolices")
+            conn.commit()
 
     def save_comparison(self, comp: ComparisonResult, report_markdown: str = "") -> str:
         """Persiste um resultado de comparação analítica e o relatório narrativo correspondente."""

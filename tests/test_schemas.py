@@ -31,13 +31,22 @@ def test_apolice_dao_creation_and_serialization():
     assert len(dao.coberturas) == 2
     assert len(dao.exclusoes) == 2
 
+    # Validação dos campos regulatórios SUSEP
+    assert dao.cod_ramo == "0378"
+    assert dao.tipo_movimento == "101"
+    assert "D&O" in dao.ramo_descricao
+    assert "Emissão" in dao.tipo_movimento_descricao
+
     # Validação de serialização JSON
     json_str = dao.model_dump_json()
     assert "TechCorp Brasil S.A." in json_str
+    assert "0378" in json_str
 
     # Desserialização
     recovered = ApoliceDAO.model_validate_json(json_str)
     assert recovered.limite_responsabilidade == "R$ 10.000.000,00"
+    assert recovered.cod_ramo == "0378"
+    assert recovered.tipo_movimento == "101"
 
 
 def test_field_diff_validation():
@@ -71,3 +80,50 @@ def test_comparison_result_validation():
     assert comp.score_similaridade == 85.5
     assert len(comp.coberturas_exclusivas_a) == 1
     assert "Side A" in comp.coberturas_comuns
+
+
+def test_sinistro_item_and_auditoria_report_schemas():
+    """Valida os schemas de auditoria contábil de sinistros e variação."""
+    from core.schemas import SinistroItem, RamoVarianceSummary, AuditoriaVarianceReport
+
+    sinistro = SinistroItem(
+        numero_sinistro="SIN-01",
+        numero_apolice="AP-100",
+        segurado="TechCorp",
+        seguradora="Allianz",
+        cod_ramo="0378",
+        ramo_nome="D&O",
+        tipo_mov="101",
+        saldo_anterior=100000.0,
+        saldo_atual=250000.0,
+        delta_variacao=150000.0,
+        status_sinistro="Avisado",
+        causa_sinistro="Processo arbitral"
+    )
+    assert sinistro.delta_variacao == 150000.0
+    assert sinistro.cod_ramo == "0378"
+
+    summary = RamoVarianceSummary(
+        cod_ramo="0378",
+        ramo_nome="D&O",
+        qtd_sinistros=1,
+        total_anterior=100000.0,
+        total_atual=250000.0,
+        delta_absoluto=150000.0,
+        delta_percentual=150.0,
+        share_na_variacao_total=100.0,
+        is_maior_ofensor=True
+    )
+    assert summary.is_maior_ofensor is True
+
+    report = AuditoriaVarianceReport(
+        periodo_referencia="08/2026",
+        total_anterior_geral=100000.0,
+        total_atual_geral=250000.0,
+        delta_global=150000.0,
+        delta_global_percentual=150.0,
+        ramo_maior_ofensor=summary,
+        sinistro_maior_ofensor=sinistro
+    )
+    assert report.ramo_maior_ofensor.cod_ramo == "0378"
+    assert report.sinistro_maior_ofensor.numero_sinistro == "SIN-01"

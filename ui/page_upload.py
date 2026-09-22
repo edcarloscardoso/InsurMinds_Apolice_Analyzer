@@ -4,27 +4,68 @@ Harmonizada para o padrão corporativo de seguradoras e resseguradoras.
 """
 from pathlib import Path
 import streamlit as st
-from core.config import UPLOADS_DIR, SAMPLE_POLICIES_DIR, MAX_FILE_SIZE_MB
+from core.config import UPLOADS_DIR, SAMPLE_POLICIES_DIR, DRIVE_POLICIES_DIR, MAX_FILE_SIZE_MB
 from core.security import get_safe_destination_path
+from core.database import db
+from ui.navigation import navigate_to
 from agents.graph import run_document_pipeline_with_progress
 
 
 def render_upload_page():
     """Renderiza a interface de ingestão com timeline de agentes."""
-    st.markdown("### 📤 Ingestão & Recepção de Apólices D&O")
+    st.markdown("### 📤 Ingestão & Recepção de Apólices")
     st.write(
-        "Envie propostas ou apólices de seguro D&O em formato PDF para extração e estruturação automática "
+        "Envie apólices ou contratos de seguro em formato PDF para extração e estruturação automática "
         "através dos agentes inteligentes de subscrição."
     )
 
-    # Botão de Carregamento Rápido de Amostras para Demonstração
+    # Banner de acesso rápido se já houver apólices salvas
+    total_cadastradas = len(db.list_apolices())
+    if total_cadastradas > 0:
+        col_repo_info, col_repo_btn = st.columns([3, 1.2])
+        with col_repo_info:
+            st.success(f"📚 **{total_cadastradas} contrato(s)** já estruturados no repositório local e prontos para consulta/comparação.")
+        with col_repo_btn:
+            st.button("Acessar Biblioteca ➔", key="btn_topo_acessar_bib", type="primary", on_click=navigate_to, args=("Biblioteca",))
+
+    # Abas de Carregamento Rápido de Amostras e Casos de Teste do Drive
     st.markdown("---")
-    col_demo, col_info = st.columns([1.3, 2.7])
-    with col_demo:
-        if st.button("⚡ Carregar Amostras Oficiais (I2A2)", type="primary", help="Carrega instantaneamente as 3 apólices D&O realistas (Allianz, Chubb e AIG)"):
-            _process_sample_policies()
-    with col_info:
-        st.info("💡 **Acesso Rápido para Banca Avaliadora:** Clique no botão ao lado para carregar e estruturar automaticamente as apólices de teste da Allianz, Chubb e AIG.")
+    st.markdown("#### ⚡ Casos de Teste Rápidos")
+    tab_d_and_o, tab_auto = st.tabs([
+        "🛡️ Amostras D&O (Ramo 0378 - I2A2)",
+        "🚗 Apólices de Mercado (Ramo 0531 Automóvel - Google Drive)"
+    ])
+
+    with tab_d_and_o:
+        col_demo, col_info = st.columns([1.3, 2.7])
+        with col_demo:
+            if st.button("⚡ Carregar Amostras D&O", type="primary", help="Carrega Allianz, Chubb, AIG e Endosso"):
+                _process_sample_policies()
+        with col_info:
+            st.info("💡 **Amostras D&O com Valores Financeiros:** Allianz, Chubb, AIG e Endosso aditivo para teste do comparador e matriz de coberturas.")
+
+    with tab_auto:
+        drive_files = sorted(list(DRIVE_POLICIES_DIR.glob("*.pdf"))) if DRIVE_POLICIES_DIR.exists() else []
+        if drive_files:
+            col_drive_btn, col_drive_info = st.columns([1.5, 2.5])
+            with col_drive_btn:
+                if st.button(f"🚗 Processar Todas as {len(drive_files)} Apólices Auto", type="primary", help="Processa contratos reais baixados: Pier, Porto, Allianz, Azul, AXA, Caixa, Itaú, Santander, Suhai, SulAmérica e Tokio Marine"):
+                    _process_drive_policies(drive_files)
+            with col_drive_info:
+                st.info(f"💡 **11 Contratos Reais Baixados do Google Drive:** Condições gerais e manuais do Ramo 0531 (Automóvel).")
+
+            with st.expander("🔍 Escolher arquivos específicos de Automóvel para testar individualmente"):
+                selected_drive = st.multiselect(
+                    "Selecione os contratos para processar:",
+                    options=[f.name for f in drive_files],
+                    default=[]
+                )
+                if selected_drive:
+                    if st.button("▶ Processar Selecionados", key="btn_process_sel_drive"):
+                        subset = [DRIVE_POLICIES_DIR / name for name in selected_drive]
+                        _process_drive_policies(subset)
+        else:
+            st.warning("Nenhum arquivo encontrado em data/drive_policies.")
 
     st.markdown("---")
 
@@ -111,9 +152,7 @@ def _process_uploaded_files(files):
     status_text.markdown("✨ **Processamento de Ingestão Finalizado!**")
     if results:
         st.success(f"🎉 {len(results)} contrato(s) estruturado(s) no banco de dados.")
-        if st.button("Ir para o Repositório de Apólices ➔", type="primary"):
-            st.session_state["nav_page"] = "Biblioteca"
-            st.rerun()
+        st.button("Ir para o Repositório de Apólices ➔", key="btn_ir_bib_upload", type="primary", on_click=navigate_to, args=("Biblioteca",))
 
 
 def _process_sample_policies():
@@ -137,6 +176,28 @@ def _process_sample_policies():
 
     status_text.markdown("✨ **Amostras estruturadas com sucesso!**")
     st.success("✅ Apólices da Allianz, Chubb e AIG prontas para confronto na Biblioteca.")
-    if st.button("Acessar Repositório Agora ➔", type="primary"):
-        st.session_state["nav_page"] = "Biblioteca"
-        st.rerun()
+    st.button("Acessar Repositório Agora ➔", key="btn_ir_bib_sample", type="primary", on_click=navigate_to, args=("Biblioteca",))
+
+
+def _process_drive_policies(files):
+    """Processa a lista de contratos de automóvel do Google Drive."""
+    total = len(files)
+    progress_bar = st.progress(0)
+    status_text = st.empty()
+    results = []
+
+    for idx, file_path in enumerate(files):
+        status_text.markdown(f"**Processando contrato {idx + 1}/{total}:** `{file_path.name}`")
+        state = run_document_pipeline_with_progress(
+            file_path=str(file_path),
+            file_name=file_path.name
+        )
+        if state.structured_data:
+            results.append(state.structured_data)
+        progress_bar.progress((idx + 1) / total)
+
+    status_text.markdown("✨ **Processamento dos Contratos de Automóvel Concluído!**")
+    st.success(f"🎉 {len(results)} apólice(s) estruturada(s) com sucesso no banco de dados!")
+    st.button("Ir para o Repositório de Apólices ➔", key="btn_ir_bib_drive", type="primary", on_click=navigate_to, args=("Biblioteca",))
+
+

@@ -4,14 +4,15 @@ Apresenta o relatório narrativo em Linguagem Natural formatado no padrão de me
 import streamlit as st
 import json
 from core.database import db
+from ui.navigation import navigate_to
 
 
 def render_report_page():
-    """Renderiza a visualização executiva do relatório gerado pelo Gemini e exportações."""
-    st.markdown("### 📄 Parecer Técnico & Memorando de Riscos D&O")
-    st.write("Síntese executiva em linguagem natural gerada por Inteligência Artificial para apoio a decisões de contratação e subscrição.")
+    """Renderiza a visualização do parecer executivo narrativo e ferramentas de exportação."""
+    st.markdown("### 📄 Parecer Executivo Narrativo (D&O)")
+    st.write("Análise comparativa aprofundada gerada por Inteligência Artificial Generativa para subsidiar a tomada de decisão da diretoria.")
 
-    report_md = st.session_state.get("active_report_markdown", "")
+    report_md = st.session_state.get("active_executive_report", None)
     comp_result = st.session_state.get("active_comparison_result", None)
 
     # Se não houver relatório ativo na sessão, tenta recuperar a comparação mais recente do banco
@@ -26,9 +27,7 @@ def render_report_page():
     if not report_md:
         st.info("Nenhum parecer comparativo ativo no momento.")
         st.markdown("👉 Selecione 2 apólices na **Biblioteca** ou acesse a tela de **Comparação** para gerar o parecer.")
-        if st.button("Ir para a Comparação", type="primary"):
-            st.session_state["nav_page"] = "Comparação"
-            st.rerun()
+        st.button("Ir para a Comparação", type="primary", on_click=navigate_to, args=("Comparação",))
         return
 
     # Barra de Ferramentas de Exportação Executiva

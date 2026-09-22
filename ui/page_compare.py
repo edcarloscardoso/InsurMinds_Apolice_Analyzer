@@ -6,6 +6,7 @@ import streamlit as st
 import pandas as pd
 from core.database import db
 from agents.graph import run_comparison_pipeline_with_progress
+from ui.navigation import navigate_to
 
 
 def render_compare_page():
@@ -16,21 +17,45 @@ def render_compare_page():
         "retroatividade e identificação de lacunas de cobertura (Gap Analysis)."
     )
 
-    # Recupera apólices selecionadas na sessão
-    selected = st.session_state.get("selected_for_compare", [])
-    if len(selected) < 2:
-        todas = db.list_apolices()
-        if len(todas) >= 2:
-            selected = todas[:2]
-            st.session_state["selected_for_compare"] = selected
-        else:
-            st.warning("⚠️ Selecione pelo menos 2 apólices na Biblioteca para realizar o confronto.")
-            if st.button("Ir para a Biblioteca", type="primary"):
-                st.session_state["nav_page"] = "Biblioteca"
-                st.rerun()
-            return
+    # Recupera ou inicializa apólices disponíveis
+    todas = db.list_apolices()
+    if len(todas) < 2:
+        st.warning("⚠️ O repositório precisa de pelo menos 2 apólices cadastradas para realizar a comparação.")
+        st.button("Ir para Ingestão e Upload", type="primary", on_click=navigate_to, args=("Upload",))
+        return
 
-    pol_a, pol_b = selected[0], selected[1]
+    opcoes_map = {
+        f"🏢 {a.seguradora or 'Seguradora'} · Ramo {a.cod_ramo or '0378'} · Mov {a.tipo_movimento or '101'} · LMG: {a.limite_responsabilidade or 'N/A'} ({a.nome_arquivo})": a
+        for a in todas
+    }
+    keys_list = list(opcoes_map.keys())
+
+    selected = st.session_state.get("selected_for_compare", [])
+    if len(selected) != 2:
+        selected = todas[:2]
+        st.session_state["selected_for_compare"] = selected
+
+    idx_a = 0
+    idx_b = 1 if len(keys_list) > 1 else 0
+    for i, (k, a) in enumerate(opcoes_map.items()):
+        if a.id == selected[0].id:
+            idx_a = i
+        if len(selected) > 1 and a.id == selected[1].id:
+            idx_b = i
+
+    col_sel_a, col_sel_b = st.columns(2)
+    with col_sel_a:
+        escolha_a = st.selectbox("📌 Apólice Proposta A:", options=keys_list, index=idx_a, key="sel_comp_pol_a")
+    with col_sel_b:
+        escolha_b = st.selectbox("📌 Apólice Proposta B:", options=keys_list, index=idx_b, key="sel_comp_pol_b")
+
+    pol_a = opcoes_map[escolha_a]
+    pol_b = opcoes_map[escolha_b]
+    st.session_state["selected_for_compare"] = [pol_a, pol_b]
+
+    if pol_a.id == pol_b.id:
+        st.info("💡 Você selecionou a mesma apólice em A e B. Escolha apólices distintas para verificar diferenças.")
+
 
     # Executa ou recupera a comparação
     cached_comp = db.get_comparison(pol_a.id, pol_b.id)
@@ -152,6 +177,4 @@ def render_compare_page():
     with col_act1:
         st.markdown("Deseja visualizar o **parecer executivo narrativo** estruturado para apresentação à diretoria?")
     with col_act2:
-        if st.button("📄 Acessar Parecer Executivo do Gemini ➔", type="primary"):
-            st.session_state["nav_page"] = "Relatório"
-            st.rerun()
+        st.button("📄 Acessar Parecer Executivo do Gemini ➔", type="primary", on_click=navigate_to, args=("Relatório",))

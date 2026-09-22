@@ -96,11 +96,12 @@ insurminds_apolice_analyzer/
 ├── app.py                             # Entrada da aplicação Streamlit
 ├── core/                              # Módulo central de lógica e dados
 │   ├── config.py                      # Configurações de ambiente e diretórios
-│   ├── schemas.py                     # Contratos canônicos Pydantic v2
+│   ├── schemas.py                     # Contratos canônicos Pydantic v2 (Apólices e Sinistros)
 │   ├── security.py                    # Validação de magic bytes e sanitização
-│   ├── database.py                    # Persistência relacional SQLite e idempotência
+│   ├── database.py                    # Persistência relacional SQLite e migração idempotente
 │   ├── diff_engine.py                 # Motor de diff determinístico e score Jaccard
-│   └── llm_client.py                  # Integração Gemini 2.0 Flash + Contingência
+│   ├── variance_engine.py             # Motor de variância contábil e detecção de maiores ofensores
+│   └── llm_client.py                  # Integração Gemini 2.0 Flash + Notas Explicativas
 ├── agents/                            # Orquestração multi-agente LangGraph
 │   ├── graph.py                       # StateGraph e fluxos de execução
 │   ├── reception_agent.py             # Agente 1: Recepção e validação
@@ -112,18 +113,20 @@ insurminds_apolice_analyzer/
 ├── ui/                                # Interface do Usuário (Streamlit)
 │   ├── styles.py                      # Estilos executivos customizados (CSS)
 │   ├── page_upload.py                 # Tela 1: Ingestão de PDFs e timeline de agentes
-│   ├── page_library.py                # Tela 2: Biblioteca de apólices e catálogo
+│   ├── page_library.py                # Tela 2: Biblioteca de apólices com COD_RAMO e TIPO_MOV
 │   ├── page_compare.py                # Tela 3: Matriz comparativa de campos e gap analysis
-│   └── page_report.py                 # Tela 4: Parecer executivo com exportação
+│   ├── page_report.py                 # Tela 4: Parecer executivo com exportação
+│   └── page_accounting.py             # Tela 5: Auditoria Contábil e Variação de Sinistros (SUSEP)
 ├── data/                              # Dados e amostras
-│   ├── sample_policies/               # PDFs sintéticos de alta fidelidade
+│   ├── sample_policies/               # PDFs sintéticos de alta fidelidade (Emissões e Endossos)
 │   ├── generate_samples.py            # Compilador de apólices D&O (ReportLab)
 │   └── apolices.db                    # Banco de dados SQLite local
 ├── tests/                             # Suíte de testes automatizados (pytest)
 │   ├── test_schemas.py                # Testes de modelos e validações Pydantic
 │   ├── test_security.py               # Testes de sanitização, magic bytes e limites
-│   ├── test_database.py               # Testes de operações CRUD e idempotência
+│   ├── test_database.py               # Testes de operações CRUD, migração e idempotência
 │   ├── test_diff_engine.py            # Testes do motor analítico de comparação
+│   ├── test_variance_engine.py        # Testes do motor de variância e maiores ofensores
 │   └── test_pipeline_integration.py   # Testes de integração end-to-end dos agentes
 └── Projeto_Final_Artefatos/           # Entregáveis acadêmicos para a banca I2A2
     ├── RELATORIO_TECNICO.md           # Relatório técnico completo de conclusão de curso

@@ -199,6 +199,8 @@ def compare_policies(apolice_a: ApoliceDAO, apolice_b: ApoliceDAO) -> Comparison
     """Executa a comparação analítica completa entre duas instâncias de ApoliceDAO."""
     diffs: List[FieldDiff] = [
         compare_scalar_field("segurado", "Empresa Segurada", apolice_a.segurado, apolice_b.segurado),
+        compare_scalar_field("cod_ramo", "Ramo SUSEP", f"{apolice_a.cod_ramo or '0378'} - {apolice_a.ramo_descricao or 'D&O'}", f"{apolice_b.cod_ramo or '0378'} - {apolice_b.ramo_descricao or 'D&O'}"),
+        compare_scalar_field("tipo_movimento", "Tipo de Movimento", f"{apolice_a.tipo_movimento or '101'} - {apolice_a.tipo_movimento_descricao or 'Emissão'}", f"{apolice_b.tipo_movimento or '101'} - {apolice_b.tipo_movimento_descricao or 'Emissão'}"),
         compare_scalar_field("vigencia_inicio", "Início de Vigência", apolice_a.vigencia_inicio, apolice_b.vigencia_inicio),
         compare_scalar_field("vigencia_fim", "Término de Vigência", apolice_a.vigencia_fim, apolice_b.vigencia_fim),
         compare_scalar_field("limite_responsabilidade", "Limite Máximo de Garantia (LMG)", apolice_a.limite_responsabilidade, apolice_b.limite_responsabilidade, is_financial=True),
