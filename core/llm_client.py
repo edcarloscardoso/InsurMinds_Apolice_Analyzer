@@ -268,10 +268,11 @@ class GeminiClient:
             seguradora = "AIG Seguros Brasil S.A."
         else:
             match = re.search(r'seguradora\s*[:\-]?\s*([A-Za-z0-9\s\.&]+)', raw_text, re.IGNORECASE)
-            seguradora = match.group(1).strip().split('\n')[0] if match else "Companhia Seguradora"
+            seguradora = match.group(1).strip().split('\n')[0] if match else None
 
         # Segurado
         segurado = None
+        candidate = None
         match = re.search(
             r'(?:tomador\s*/\s*segurad[ao]|empresa\s+segurada|tomador|segurad[ao])\s*[:\-]\s*(.+?)(?=\s{2,}ap[oó]lice|\n\s*per[ií]odo|\n\s*ap[oó]lice|\n\s*vig[eê]ncia|\n\s*limite)',
             raw_text,
@@ -402,7 +403,17 @@ class GeminiClient:
             else:
                 territorio = None
 
-        legislacao = "Legislação Brasileira, Foro da Comarca de São Paulo/SP"
+        legislacao = None
+        match_foro = re.search(
+            r'(?:foro|jurisdi[cç][aã]o|legisla[cç][aã]o(?:s+aplic[aá]vel)?)s*[:-]?s*([^
+]{3,160})',
+            raw_text,
+            re.IGNORECASE
+        )
+        if match_foro:
+            legislacao = match_foro.group(1).strip()
+        elif is_demo_sample:
+            legislacao = "Legislação Brasileira, Foro da Comarca de São Paulo/SP"
 
         # Coberturas e Exclusões padrão extraídas do documento
         # Detecção de Ramo SUSEP
