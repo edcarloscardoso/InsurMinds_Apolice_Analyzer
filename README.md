@@ -65,7 +65,7 @@ Copie o arquivo `.env.example` para `.env` e configure sua chave do Google Gemin
 ```bash
 cp .env.example .env
 ```
-> **Nota de Resiliência:** Caso você não possua uma chave da API do Gemini configurada, o sistema aciona automaticamente o **Modo de Contingência Heurístico**, permitindo a execução e demonstração de 100% dos fluxos sem erros.
+> **Nota de Resiliência:** Caso você não possua uma chave da API do Gemini configurada, o sistema entra em **Modo de Contingência Heurístico Seguro**. Nesse modo, documentos externos são tratados de forma conservadora: somente evidências detectáveis são preenchidas e campos sem evidência permanecem não determinados. Fixtures sintéticas versionadas do projeto possuem fallback de demonstração explícito e isolado.
 
 ### Passo 5: Iniciar a Aplicação Streamlit
 ```bash

@@ -39,28 +39,147 @@ class GeminiClient:
         """Indica se a API remota do Gemini está pronta para chamadas."""
         return self.client is not None
 
-    def segment_clauses(self, raw_text: str) -> Dict[str, str]:
-        """Segmenta o texto bruto da apólice em seções contratuais relevantes."""
-        if self.is_available():
-            try:
-                prompt = (
-                    "Você é um especialista em seguros D&O (Directors and Officers). "
-                    "Analise o texto a seguir e separe-o nas seguintes seções em formato JSON: "
-                    "'dados_gerais', 'coberturas', 'exclusoes', 'valores_e_franquias', 'escopo_e_foro'.\n\n"
-                    f"Texto da Apólice:\n{raw_text[:20000]}"
-                )
-                response = self.client.models.generate_content(
-                    model=GEMINI_MODEL,
-                    contents=prompt
-                )
-                text = response.text or "{}"
-                json_match = re.search(r'\{.*\}', text, re.DOTALL)
-                if json_match:
-                    return json.loads(json_match.group(0))
-            except Exception as e:
-                logger.error(f"Erro ao segmentar cláusulas via Gemini: {e}. Acionando fallback heurístico.")
+    @staticmethod
+    def _is_demo_sample(nome_arquivo: str) -> bool:
+        """Identifica exclusivamente fixtures sintéticas versionadas do projeto.
+        
+        O fallback de demonstração nunca deve ser aplicado por semelhança textual a
+        documentos externos. Isso evita vazamento de dados sintéticos para documentos reais.
+        """
+        return nome_arquivo.lower() in {
+            "apolice_do_aig.pdf",
+            "apolice_do_allianz.pdf",
+            "apolice_do_chubb.pdf",
+            "apolice_do_allianz_endosso.pdf",
+        }
 
-        # Fallback heurístico inteligente
+    @staticmethod
+    def _detect_document_domain(raw_text: str, nome_arquivo: str) -> str:
+        """Classificação conservadora de domínio para o fallback offline.
+        
+        Retorna apenas 'do', 'auto' ou 'unknown'. A palavra isolada 'veículo' nunca
+        é suficiente para classificar um documento como Automóvel.
+        """
+        text = f"{nome_arquivo}\n{raw_text}".lower()
+        do_markers = (
+            "d&o", "directors and officers", "directors & officers",
+            "responsabilidade civil de administradores", "administradores e diretores",
+            "side a", "side b", "side c", "wrongful act", "ato de gestão",
+            "seguro d&o", "seguro de administradores"
+        )
+        auto_markers = (
+            "seguro automóvel", "seguro de automóvel", "condições gerais de automóvel",
+            "ramo automóvel", "automóvel casco", "rcf-v", "acidentes pessoais de passageiros",
+            "veículo segurado", "chassi", "placa do veículo", "cobertura compreensiva",
+            "casco automóvel"
+        )
+        do_score = sum(1 for marker in do_markers if marker in text)
+        auto_score = sum(1 for marker in auto_markers if marker in text)
+
+        if do_score >= 1 and do_score > auto_score:
+            return "do"
+        if auto_score >= 2 and auto_score > do_score:
+            return "auto"
+        return "unknown"
+
+    @staticmethod
+    def _chunk_text(raw_text: str, max_chars: int = 45000, overlap: int = 3000) -> List[str]:
+        """Divide o documento completo em blocos sobrepostos sem descartar o restante do texto."""
+        text = raw_text or ""
+        if not text:
+            return [""]
+        if max_chars <= overlap:
+            raise ValueError("max_chars deve ser maior que overlap")
+
+        chunks: List[str] = []
+        start = 0
+        text_len = len(text)
+
+        while start < text_len:
+            hard_end = min(start + max_chars, text_len)
+            end = hard_end
+
+            # Quando possível, encerra próximo de um marcador de página para preservar contexto.
+            if hard_end < text_len:
+                page_break = text.rfind("\n--- PÁGINA ", start + max_chars // 2, hard_end)
+                if page_break > start:
+                    end = page_break
+
+            chunk = text[start:end].strip()
+            if chunk:
+                chunks.append(chunk)
+
+            if end >= text_len:
+                break
+
+            next_start = max(end - overlap, start + 1)
+            start = next_start
+
+        return chunks or [""]
+
+    @staticmethod
+    def _parse_json_object(text: str) -> Optional[Dict[str, Any]]:
+        """Extrai um objeto JSON da resposta textual do modelo."""
+        if not text:
+            return None
+        try:
+            parsed = json.loads(text)
+            return parsed if isinstance(parsed, dict) else None
+        except json.JSONDecodeError:
+            match = re.search(r'\{.*\}', text, re.DOTALL)
+            if not match:
+                return None
+            try:
+                parsed = json.loads(match.group(0))
+                return parsed if isinstance(parsed, dict) else None
+            except json.JSONDecodeError:
+                return None
+
+    def segment_clauses(self, raw_text: str) -> Dict[str, str]:
+        """Segmenta o documento inteiro em seções temáticas usando processamento por chunks."""
+        if self.is_available():
+            chunks = self._chunk_text(raw_text)
+            merged = {
+                "dados_gerais": "",
+                "coberturas": "",
+                "exclusoes": "",
+                "valores_e_franquias": "",
+                "escopo_e_foro": "",
+            }
+            successful_chunks = 0
+
+            for idx, chunk in enumerate(chunks, start=1):
+                try:
+                    prompt = (
+                        "Você é um especialista em seguros D&O (Directors and Officers). "
+                        "Analise TODO o trecho abaixo, que faz parte de um contrato completo. "
+                        "Não invente conteúdo. Classifique apenas texto efetivamente presente "
+                        "nas seguintes seções: 'dados_gerais', 'coberturas', 'exclusoes', "
+                        "'valores_e_franquias', 'escopo_e_foro'. "
+                        "Retorne APENAS um objeto JSON válido, sem markdown. "
+                        f"Trecho {idx}/{len(chunks)}:\n\n{chunk}"
+                    )
+                    response = self.client.models.generate_content(
+                        model=GEMINI_MODEL,
+                        contents=prompt
+                    )
+                    data = self._parse_json_object(response.text or "")
+                    if not data:
+                        continue
+
+                    successful_chunks += 1
+                    for key in merged:
+                        value = data.get(key)
+                        if value:
+                            merged[key] += (("\n\n" if merged[key] else "") + str(value))
+                except Exception as e:
+                    logger.warning(
+                        f"Falha no chunk {idx}/{len(chunks)} durante segmentação Gemini: {e}"
+                    )
+
+            if successful_chunks > 0:
+                return merged
+
         return self._heuristic_segmentation(raw_text)
 
     def extract_structured_apolice(
@@ -70,70 +189,129 @@ class GeminiClient:
         file_hash: str,
         metodo_extracao: str = "pdfplumber"
     ) -> ApoliceDAO:
-        """Converte o texto da apólice no objeto canônico ApoliceDAO via Gemini ou heurística."""
+        """Consolida a estrutura canônica a partir de todo o documento, processado em chunks."""
         if self.is_available():
-            try:
-                prompt = (
-                    "Você é um engenheiro de dados sênior especialista em seguros D&O. "
-                    "Extraia as seguintes informações do texto da apólice abaixo e responda APENAS um JSON válido:\n"
-                    "{\n"
-                    '  "seguradora": "Nome da seguradora",\n'
-                    '  "segurado": "Razão social da empresa segurada",\n'
-                    '  "numero_apolice": "Número da apólice",\n'
-                    '  "vigencia_inicio": "DD/MM/AAAA",\n'
-                    '  "vigencia_fim": "DD/MM/AAAA",\n'
-                    '  "premio_total": "R$ valor",\n'
-                    '  "limite_responsabilidade": "R$ valor (LMG)",\n'
-                    '  "franquia": "R$ valor ou percentual",\n'
-                    '  "coberturas": ["cobertura 1", "cobertura 2"],\n'
-                    '  "exclusoes": ["exclusao 1", "exclusao 2"],\n'
-                    '  "clausulas_especiais": ["clausula 1"],\n'
-                    '  "retroatividade": "data ou descrição",\n'
-                    '  "territorio": "abrangência",\n'
-                    '  "legislacao_aplicavel": "foro/lei",\n'
-                    '  "cod_ramo": "0378 (4 dígitos do ramo SUSEP)",\n'
-                    '  "ramo_descricao": "Descrição do ramo",\n'
-                    '  "tipo_movimento": "101 (Código SUSEP: 101-Emissão, 102-Endosso Adicional, etc.)",\n'
-                    '  "tipo_movimento_descricao": "Emissão de Apólice"\n'
-                    "}\n\n"
-                    f"Texto da apólice:\n{raw_text[:25000]}"
-                )
+            chunks = self._chunk_text(raw_text)
+            partials: List[Dict[str, Any]] = []
 
-                response = self.client.models.generate_content(
-                    model=GEMINI_MODEL,
-                    contents=prompt
-                )
-                text = response.text or "{}"
-                json_match = re.search(r'\{.*\}', text, re.DOTALL)
-                if json_match:
-                    data = json.loads(json_match.group(0))
-                    return ApoliceDAO(
-                        id=file_hash,
-                        nome_arquivo=nome_arquivo,
-                        data_processamento=data.get("data_processamento") or "2026-09-04T16:00:00",
-                        seguradora=data.get("seguradora"),
-                        segurado=data.get("segurado"),
-                        numero_apolice=data.get("numero_apolice"),
-                        vigencia_inicio=data.get("vigencia_inicio"),
-                        vigencia_fim=data.get("vigencia_fim"),
-                        premio_total=data.get("premio_total"),
-                        limite_responsabilidade=data.get("limite_responsabilidade"),
-                        franquia=data.get("franquia"),
-                        coberturas=data.get("coberturas", []),
-                        exclusoes=data.get("exclusoes", []),
-                        clausulas_especiais=data.get("clausulas_especiais", []),
-                        retroatividade=data.get("retroatividade"),
-                        territorio=data.get("territorio"),
-                        legislacao_aplicavel=data.get("legislacao_aplicavel"),
-                        cod_ramo=str(data.get("cod_ramo", "0378")).strip()[:4] or "0378",
-                        ramo_descricao=data.get("ramo_descricao") or "Responsabilidade Civil D&O",
-                        tipo_movimento=str(data.get("tipo_movimento", "101")).strip()[:3] or "101",
-                        tipo_movimento_descricao=data.get("tipo_movimento_descricao") or "Emissão de Apólice",
-                        metodo_extracao=metodo_extracao,
-                        confianca_extracao=0.95
+            for idx, chunk in enumerate(chunks, start=1):
+                try:
+                    prompt = (
+                        "Você é um engenheiro de dados sênior especialista em seguros D&O. "
+                        "Extraia SOMENTE informações explicitamente presentes no trecho fornecido. "
+                        "Não use conhecimento externo e não preencha campos por padrão. "
+                        "Quando um dado não estiver presente no trecho, use null ou []. "
+                        "Responda APENAS JSON válido, sem markdown. "
+                        "O código do ramo só pode ser informado quando houver evidência textual explícita "
+                        "ou uma identificação inequívoca do produto no trecho. "
+                        "O tipo de movimento só pode ser informado quando houver indicação explícita.\n\n"
+                        "{\n"
+                        '  "seguradora": null,\n'
+                        '  "segurado": null,\n'
+                        '  "numero_apolice": null,\n'
+                        '  "vigencia_inicio": null,\n'
+                        '  "vigencia_fim": null,\n'
+                        '  "premio_total": null,\n'
+                        '  "limite_responsabilidade": null,\n'
+                        '  "franquia": null,\n'
+                        '  "coberturas": [],\n'
+                        '  "exclusoes": [],\n'
+                        '  "clausulas_especiais": [],\n'
+                        '  "retroatividade": null,\n'
+                        '  "territorio": null,\n'
+                        '  "legislacao_aplicavel": null,\n'
+                        '  "cod_ramo": null,\n'
+                        '  "ramo_descricao": null,\n'
+                        '  "tipo_movimento": null,\n'
+                        '  "tipo_movimento_descricao": null\n'
+                        "}\n\n"
+                        f"Trecho {idx}/{len(chunks)} do documento:\n{chunk}"
                     )
-            except Exception as e:
-                logger.error(f"Erro na extração estruturada via Gemini: {e}. Acionando extrator de contingência.")
+                    response = self.client.models.generate_content(
+                        model=GEMINI_MODEL,
+                        contents=prompt
+                    )
+                    data = self._parse_json_object(response.text or "")
+                    if data:
+                        partials.append(data)
+                except Exception as e:
+                    logger.warning(
+                        f"Falha no chunk {idx}/{len(chunks)} durante extração Gemini: {e}"
+                    )
+
+            if partials:
+                scalar_fields = [
+                    "seguradora", "segurado", "numero_apolice",
+                    "vigencia_inicio", "vigencia_fim", "premio_total",
+                    "limite_responsabilidade", "franquia", "retroatividade",
+                    "territorio", "legislacao_aplicavel", "cod_ramo",
+                    "ramo_descricao", "tipo_movimento", "tipo_movimento_descricao"
+                ]
+                list_fields = ["coberturas", "exclusoes", "clausulas_especiais"]
+
+                data_merged: Dict[str, Any] = {}
+                for field in scalar_fields:
+                    data_merged[field] = next(
+                        (
+                            item.get(field)
+                            for item in partials
+                            if item.get(field) not in (None, "", [], {})
+                        ),
+                        None,
+                    )
+
+                for field in list_fields:
+                    values: List[str] = []
+                    for item in partials:
+                        raw_values = item.get(field) or []
+                        if not isinstance(raw_values, list):
+                            continue
+                        for value in raw_values:
+                            normalized = str(value).strip()
+                            if normalized and normalized not in values:
+                                values.append(normalized)
+                    data_merged[field] = values
+
+                missing_fields = [
+                    field for field in scalar_fields + list_fields
+                    if data_merged.get(field) in (None, "", [])
+                ]
+                confidence = 0.95 * (len(partials) / max(len(chunks), 1))
+
+                return ApoliceDAO(
+                    id=file_hash,
+                    nome_arquivo=nome_arquivo,
+                    data_processamento=__import__("datetime").datetime.now().isoformat(),
+                    seguradora=data_merged.get("seguradora"),
+                    segurado=data_merged.get("segurado"),
+                    numero_apolice=data_merged.get("numero_apolice"),
+                    vigencia_inicio=data_merged.get("vigencia_inicio"),
+                    vigencia_fim=data_merged.get("vigencia_fim"),
+                    premio_total=data_merged.get("premio_total"),
+                    limite_responsabilidade=data_merged.get("limite_responsabilidade"),
+                    franquia=data_merged.get("franquia"),
+                    coberturas=data_merged.get("coberturas", []),
+                    exclusoes=data_merged.get("exclusoes", []),
+                    clausulas_especiais=data_merged.get("clausulas_especiais", []),
+                    retroatividade=data_merged.get("retroatividade"),
+                    territorio=data_merged.get("territorio"),
+                    legislacao_aplicavel=data_merged.get("legislacao_aplicavel"),
+                    cod_ramo=(
+                        str(data_merged["cod_ramo"]).strip()[:4]
+                        if data_merged.get("cod_ramo") not in (None, "")
+                        else None
+                    ),
+                    ramo_descricao=data_merged.get("ramo_descricao"),
+                    tipo_movimento=(
+                        str(data_merged["tipo_movimento"]).strip()[:3]
+                        if data_merged.get("tipo_movimento") not in (None, "")
+                        else None
+                    ),
+                    tipo_movimento_descricao=data_merged.get("tipo_movimento_descricao"),
+                    metodo_extracao=metodo_extracao,
+                    confianca_extracao=round(confidence, 3),
+                    campos_nao_encontrados=missing_fields,
+                )
 
         return self._heuristic_extractor(raw_text, nome_arquivo, file_hash, metodo_extracao)
 
@@ -225,10 +403,11 @@ class GeminiClient:
             seguradora = "AIG Seguros Brasil S.A."
         else:
             match = re.search(r'seguradora\s*[:\-]?\s*([A-Za-z0-9\s\.&]+)', raw_text, re.IGNORECASE)
-            seguradora = match.group(1).strip().split('\n')[0] if match else "Companhia Seguradora"
+            seguradora = match.group(1).strip().split('\n')[0] if match else None
 
         # Segurado
         segurado = None
+        candidate = None
         match = re.search(
             r'(?:tomador\s*/\s*segurad[ao]|empresa\s+segurada|tomador|segurad[ao])\s*[:\-]\s*(.+?)(?=\s{2,}ap[oó]lice|\n\s*per[ií]odo|\n\s*ap[oó]lice|\n\s*vig[eê]ncia|\n\s*limite)',
             raw_text,
@@ -237,7 +416,9 @@ class GeminiClient:
         if match:
             candidate = ' '.join(match.group(1).split()).strip()
             candidate = re.sub(r'^[/\s\-]+', '', candidate)
-        is_auto_manual = "auto" in nome_arquivo.lower() or "automóvel" in raw_text.lower() or "veículo" in raw_text.lower()
+        document_domain = self._detect_document_domain(raw_text, nome_arquivo)
+        is_demo_sample = self._is_demo_sample(nome_arquivo)
+        is_auto_manual = document_domain == "auto"
 
         if is_auto_manual:
             if not segurado or len(segurado) > 80 or "art." in segurado.lower() or "tokio" in segurado.lower() or "porto" in segurado.lower():
@@ -246,8 +427,11 @@ class GeminiClient:
             if candidate and 3 < len(candidate) < 80:
                 segurado = candidate
             if not segurado:
-                match_fallback = re.search(r'(?:techcorp[^\n\r]+)', raw_text, re.IGNORECASE)
-                segurado = match_fallback.group(0).strip() if match_fallback else "TechCorp Brasil Inovações e Soluções Tecnológicas S.A."
+                if is_demo_sample:
+                    match_fallback = re.search(r'(?:techcorp[^\n\r]+)', raw_text, re.IGNORECASE)
+                    segurado = match_fallback.group(0).strip() if match_fallback else "TechCorp Brasil Inovações e Soluções Tecnológicas S.A."
+                else:
+                    segurado = None
         
         segurado = ' '.join(str(segurado).split()).strip()
         if len(segurado) > 80:
@@ -263,7 +447,10 @@ class GeminiClient:
         elif match_apolice:
             num_apolice = match_apolice.group(1).strip()
         else:
-            num_apolice = "01.0775.000458/01" if not is_auto_manual else "SUSEP 15414.650252/2024-75"
+            if is_demo_sample:
+                num_apolice = "SUSEP 15414.650252/2024-75" if is_auto_manual else "01.0775.000458/01"
+            else:
+                num_apolice = None
 
         # Vigência
         vigencia_inicio = None
@@ -271,12 +458,15 @@ class GeminiClient:
         dates = re.findall(r'\b\d{2}/\d{2}/\d{4}\b', raw_text)
         if len(dates) >= 2:
             vigencia_inicio, vigencia_fim = dates[0], dates[1]
-        elif is_auto_manual:
+        elif is_demo_sample and is_auto_manual:
             vigencia_inicio = "24h do dia de emissão"
             vigencia_fim = "365 dias (Vigência Anual)"
-        else:
+        elif is_demo_sample:
             vigencia_inicio = "01/01/2026"
             vigencia_fim = "01/01/2027"
+        else:
+            vigencia_inicio = None
+            vigencia_fim = None
 
         # Limite de Responsabilidade (LMG / FIPE)
         limite = None
@@ -287,14 +477,17 @@ class GeminiClient:
             if match:
                 limite = match.group(1).strip().split('\n')[0]
             else:
-                if "15.000.000" in raw_text:
-                    limite = "R$ 15.000.000,00"
-                elif "10.000.000" in raw_text:
-                    limite = "R$ 10.000.000,00"
-                elif "5.000.000" in raw_text:
-                    limite = "R$ 5.000.000,00"
+                if is_demo_sample:
+                    if "15.000.000" in raw_text:
+                        limite = "R$ 15.000.000,00"
+                    elif "10.000.000" in raw_text:
+                        limite = "R$ 10.000.000,00"
+                    elif "5.000.000" in raw_text:
+                        limite = "R$ 5.000.000,00"
+                    else:
+                        limite = "R$ 10.000.000,00"
                 else:
-                    limite = "R$ 10.000.000,00"
+                    limite = None
 
         # Franquia
         franquia = None
@@ -304,8 +497,10 @@ class GeminiClient:
             match = re.search(r'(?:franquia|reten[çc][aã]o)\s*[:\-]?\s*(r\$\s*[\d\.,\s]+|isento|sem\s+franquia)', raw_text, re.IGNORECASE)
             if match:
                 franquia = match.group(1).strip().split('\n')[0]
-            else:
+            elif is_demo_sample:
                 franquia = "R$ 50.000,00 (Isento para Side A)"
+            else:
+                franquia = None
 
         # Prêmio Total
         premio = None
@@ -315,8 +510,10 @@ class GeminiClient:
             match = re.search(r'(?:pr[eê]mio\s+total|pr[eê]mio\s+l[ií]quido)\s*[:\-]?\s*(r\$\s*[\d\.,\s]+)', raw_text, re.IGNORECASE)
             if match:
                 premio = match.group(1).strip().split('\n')[0]
-            else:
+            elif is_demo_sample:
                 premio = "R$ 120.000,00"
+            else:
+                premio = None
 
         # Retroatividade
         retroatividade = None
@@ -324,7 +521,7 @@ class GeminiClient:
         if match_retro:
             retroatividade = match_retro.group(1).strip()
         else:
-            retroatividade = "01/01/2023 (3 anos de retroatividade)"
+            retroatividade = "01/01/2023 (3 anos de retroatividade)" if is_demo_sample else None
 
         # Território e Foro
         territorio = None
@@ -336,10 +533,21 @@ class GeminiClient:
                 territorio = "Brasil e Jurisdição Mundial (exceto EUA e Canadá)"
             elif "inclusive eua" in raw_text.lower():
                 territorio = "Mundial (inclusive EUA e Canadá)"
-            else:
+            elif is_demo_sample:
                 territorio = "Brasil e Jurisdição Mundial (exceto EUA e Canadá)"
+            else:
+                territorio = None
 
-        legislacao = "Legislação Brasileira, Foro da Comarca de São Paulo/SP"
+        legislacao = None
+        match_foro = re.search(
+            r'(?:foro|jurisdi[cç][aã]o|legisla[cç][aã]o(?:\s+aplic[aá]vel)?)\s*[:\-]?\s*([^\n\r]{3,160})',
+            raw_text,
+            re.IGNORECASE
+        )
+        if match_foro:
+            legislacao = match_foro.group(1).strip()
+        elif is_demo_sample:
+            legislacao = "Legislação Brasileira, Foro da Comarca de São Paulo/SP"
 
         # Coberturas e Exclusões padrão extraídas do documento
         # Detecção de Ramo SUSEP
@@ -350,9 +558,15 @@ class GeminiClient:
             cod_ramo = match_ramo.group(1).strip()
             from core.variance_engine import get_ramo_name
             ramo_desc = get_ramo_name(cod_ramo)
-        elif "automóvel" in raw_text.lower() or "veículo" in raw_text.lower() or "auto" in nome_arquivo.lower():
+        elif document_domain == "auto":
             cod_ramo = "0531"
             ramo_desc = "Automóvel - Casco / RCF"
+        elif document_domain == "do":
+            cod_ramo = "0378"
+            ramo_desc = "Responsabilidade Civil D&O"
+        else:
+            cod_ramo = None
+            ramo_desc = None
 
         # Coberturas e Exclusões padrão extraídas do documento conforme o ramo
         coberturas = []
@@ -373,7 +587,7 @@ class GeminiClient:
                 token = c.split('(')[0].strip()
                 if any(word.lower() in raw_text.lower() for word in token.split() if len(word) > 4):
                     coberturas.append(c)
-            if not coberturas:
+            if not coberturas and is_demo_sample:
                 coberturas = auto_cobs[:5]
 
             auto_excs = [
@@ -388,7 +602,7 @@ class GeminiClient:
                 token = e.split(',')[0].strip()
                 if any(word.lower() in raw_text.lower() for word in token.split() if len(word) > 4):
                     exclusoes.append(e)
-            if not exclusoes:
+            if not exclusoes and is_demo_sample:
                 exclusoes = auto_excs[:4]
         else:
             cobs_candidates = [
@@ -407,7 +621,7 @@ class GeminiClient:
                 token = c.split('(')[0].strip()
                 if any(word.lower() in raw_text.lower() for word in token.split() if len(word) > 4):
                     coberturas.append(c)
-            if not coberturas:
+            if not coberturas and is_demo_sample:
                 coberturas = cobs_candidates[:6]
 
             excs_candidates = [
@@ -423,7 +637,7 @@ class GeminiClient:
                 token = e.split(',')[0].strip()
                 if any(word.lower() in raw_text.lower() for word in token.split() if len(word) > 4):
                     exclusoes.append(e)
-            if not exclusoes:
+            if not exclusoes and is_demo_sample:
                 exclusoes = excs_candidates[:5]
 
         lower_raw = raw_text.lower()
@@ -468,8 +682,26 @@ class GeminiClient:
             ramo_descricao=ramo_desc,
             tipo_movimento=tipo_mov,
             tipo_movimento_descricao=tipo_desc,
-            metodo_extracao=metodo_extracao,
-            confianca_extracao=0.88
+            metodo_extracao="mock_fallback" if is_demo_sample else "heuristic_fallback",
+            confianca_extracao=0.88 if is_demo_sample else 0.35,
+            campos_nao_encontrados=[
+                campo for campo, valor in {
+                    "seguradora": seguradora,
+                    "segurado": segurado,
+                    "numero_apolice": num_apolice,
+                    "vigencia_inicio": vigencia_inicio,
+                    "vigencia_fim": vigencia_fim,
+                    "premio_total": premio,
+                    "limite_responsabilidade": limite,
+                    "franquia": franquia,
+                    "coberturas": coberturas,
+                    "exclusoes": exclusoes,
+                    "retroatividade": retroatividade,
+                    "territorio": territorio,
+                    "legislacao_aplicavel": legislacao,
+                    "cod_ramo": cod_ramo,
+                }.items() if valor in (None, "", [])
+            ]
         )
 
     def generate_audit_variance_justification(self, report: Any) -> str:
