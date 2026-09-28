@@ -39,6 +39,49 @@ class GeminiClient:
         """Indica se a API remota do Gemini está pronta para chamadas."""
         return self.client is not None
 
+    @staticmethod
+    def _is_demo_sample(nome_arquivo: str) -> bool:
+        """Identifica exclusivamente fixtures sintéticas versionadas do projeto.
+        
+        O fallback de demonstração nunca deve ser aplicado por semelhança textual a
+        documentos externos. Isso evita vazamento de dados sintéticos para documentos reais.
+        """
+        return nome_arquivo.lower() in {
+            "apolice_do_aig.pdf",
+            "apolice_do_allianz.pdf",
+            "apolice_do_chubb.pdf",
+            "apolice_do_allianz_endosso.pdf",
+        }
+
+    @staticmethod
+    def _detect_document_domain(raw_text: str, nome_arquivo: str) -> str:
+        """Classificação conservadora de domínio para o fallback offline.
+        
+        Retorna apenas 'do', 'auto' ou 'unknown'. A palavra isolada 'veículo' nunca
+        é suficiente para classificar um documento como Automóvel.
+        """
+        text = f"{nome_arquivo}\n{raw_text}".lower()
+        do_markers = (
+            "d&o", "directors and officers", "directors & officers",
+            "responsabilidade civil de administradores", "administradores e diretores",
+            "side a", "side b", "side c", "wrongful act", "ato de gestão",
+            "seguro d&o", "seguro de administradores"
+        )
+        auto_markers = (
+            "seguro automóvel", "seguro de automóvel", "condições gerais de automóvel",
+            "ramo automóvel", "automóvel casco", "rcf-v", "acidentes pessoais de passageiros",
+            "veículo segurado", "chassi", "placa do veículo", "cobertura compreensiva",
+            "casco automóvel"
+        )
+        do_score = sum(1 for marker in do_markers if marker in text)
+        auto_score = sum(1 for marker in auto_markers if marker in text)
+
+        if do_score >= 1 and do_score > auto_score:
+            return "do"
+        if auto_score >= 2 and auto_score > do_score:
+            return "auto"
+        return "unknown"
+
     def segment_clauses(self, raw_text: str) -> Dict[str, str]:
         """Segmenta o texto bruto da apólice em seções contratuais relevantes."""
         if self.is_available():
@@ -237,7 +280,9 @@ class GeminiClient:
         if match:
             candidate = ' '.join(match.group(1).split()).strip()
             candidate = re.sub(r'^[/\s\-]+', '', candidate)
-        is_auto_manual = "auto" in nome_arquivo.lower() or "automóvel" in raw_text.lower() or "veículo" in raw_text.lower()
+        document_domain = self._detect_document_domain(raw_text, nome_arquivo)
+        is_demo_sample = self._is_demo_sample(nome_arquivo)
+        is_auto_manual = document_domain == "auto"
 
         if is_auto_manual:
             if not segurado or len(segurado) > 80 or "art." in segurado.lower() or "tokio" in segurado.lower() or "porto" in segurado.lower():
@@ -246,8 +291,11 @@ class GeminiClient:
             if candidate and 3 < len(candidate) < 80:
                 segurado = candidate
             if not segurado:
-                match_fallback = re.search(r'(?:techcorp[^\n\r]+)', raw_text, re.IGNORECASE)
-                segurado = match_fallback.group(0).strip() if match_fallback else "TechCorp Brasil Inovações e Soluções Tecnológicas S.A."
+                if is_demo_sample:
+                    match_fallback = re.search(r'(?:techcorp[^\n\r]+)', raw_text, re.IGNORECASE)
+                    segurado = match_fallback.group(0).strip() if match_fallback else "TechCorp Brasil Inovações e Soluções Tecnológicas S.A."
+                else:
+                    segurado = None
         
         segurado = ' '.join(str(segurado).split()).strip()
         if len(segurado) > 80:
@@ -263,7 +311,10 @@ class GeminiClient:
         elif match_apolice:
             num_apolice = match_apolice.group(1).strip()
         else:
-            num_apolice = "01.0775.000458/01" if not is_auto_manual else "SUSEP 15414.650252/2024-75"
+            if is_demo_sample:
+                num_apolice = "SUSEP 15414.650252/2024-75" if is_auto_manual else "01.0775.000458/01"
+            else:
+                num_apolice = None
 
         # Vigência
         vigencia_inicio = None
@@ -271,12 +322,15 @@ class GeminiClient:
         dates = re.findall(r'\b\d{2}/\d{2}/\d{4}\b', raw_text)
         if len(dates) >= 2:
             vigencia_inicio, vigencia_fim = dates[0], dates[1]
-        elif is_auto_manual:
+        elif is_demo_sample and is_auto_manual:
             vigencia_inicio = "24h do dia de emissão"
             vigencia_fim = "365 dias (Vigência Anual)"
-        else:
+        elif is_demo_sample:
             vigencia_inicio = "01/01/2026"
             vigencia_fim = "01/01/2027"
+        else:
+            vigencia_inicio = None
+            vigencia_fim = None
 
         # Limite de Responsabilidade (LMG / FIPE)
         limite = None
@@ -287,14 +341,17 @@ class GeminiClient:
             if match:
                 limite = match.group(1).strip().split('\n')[0]
             else:
-                if "15.000.000" in raw_text:
-                    limite = "R$ 15.000.000,00"
-                elif "10.000.000" in raw_text:
-                    limite = "R$ 10.000.000,00"
-                elif "5.000.000" in raw_text:
-                    limite = "R$ 5.000.000,00"
+                if is_demo_sample:
+                    if "15.000.000" in raw_text:
+                        limite = "R$ 15.000.000,00"
+                    elif "10.000.000" in raw_text:
+                        limite = "R$ 10.000.000,00"
+                    elif "5.000.000" in raw_text:
+                        limite = "R$ 5.000.000,00"
+                    else:
+                        limite = "R$ 10.000.000,00"
                 else:
-                    limite = "R$ 10.000.000,00"
+                    limite = None
 
         # Franquia
         franquia = None
@@ -304,8 +361,10 @@ class GeminiClient:
             match = re.search(r'(?:franquia|reten[çc][aã]o)\s*[:\-]?\s*(r\$\s*[\d\.,\s]+|isento|sem\s+franquia)', raw_text, re.IGNORECASE)
             if match:
                 franquia = match.group(1).strip().split('\n')[0]
-            else:
+            elif is_demo_sample:
                 franquia = "R$ 50.000,00 (Isento para Side A)"
+            else:
+                franquia = None
 
         # Prêmio Total
         premio = None
@@ -315,8 +374,10 @@ class GeminiClient:
             match = re.search(r'(?:pr[eê]mio\s+total|pr[eê]mio\s+l[ií]quido)\s*[:\-]?\s*(r\$\s*[\d\.,\s]+)', raw_text, re.IGNORECASE)
             if match:
                 premio = match.group(1).strip().split('\n')[0]
-            else:
+            elif is_demo_sample:
                 premio = "R$ 120.000,00"
+            else:
+                premio = None
 
         # Retroatividade
         retroatividade = None
@@ -324,7 +385,7 @@ class GeminiClient:
         if match_retro:
             retroatividade = match_retro.group(1).strip()
         else:
-            retroatividade = "01/01/2023 (3 anos de retroatividade)"
+            retroatividade = "01/01/2023 (3 anos de retroatividade)" if is_demo_sample else None
 
         # Território e Foro
         territorio = None
@@ -336,8 +397,10 @@ class GeminiClient:
                 territorio = "Brasil e Jurisdição Mundial (exceto EUA e Canadá)"
             elif "inclusive eua" in raw_text.lower():
                 territorio = "Mundial (inclusive EUA e Canadá)"
-            else:
+            elif is_demo_sample:
                 territorio = "Brasil e Jurisdição Mundial (exceto EUA e Canadá)"
+            else:
+                territorio = None
 
         legislacao = "Legislação Brasileira, Foro da Comarca de São Paulo/SP"
 
@@ -350,9 +413,15 @@ class GeminiClient:
             cod_ramo = match_ramo.group(1).strip()
             from core.variance_engine import get_ramo_name
             ramo_desc = get_ramo_name(cod_ramo)
-        elif "automóvel" in raw_text.lower() or "veículo" in raw_text.lower() or "auto" in nome_arquivo.lower():
+        elif document_domain == "auto":
             cod_ramo = "0531"
             ramo_desc = "Automóvel - Casco / RCF"
+        elif document_domain == "do":
+            cod_ramo = "0378"
+            ramo_desc = "Responsabilidade Civil D&O"
+        else:
+            cod_ramo = None
+            ramo_desc = None
 
         # Coberturas e Exclusões padrão extraídas do documento conforme o ramo
         coberturas = []
@@ -373,7 +442,7 @@ class GeminiClient:
                 token = c.split('(')[0].strip()
                 if any(word.lower() in raw_text.lower() for word in token.split() if len(word) > 4):
                     coberturas.append(c)
-            if not coberturas:
+            if not coberturas and is_demo_sample:
                 coberturas = auto_cobs[:5]
 
             auto_excs = [
@@ -388,7 +457,7 @@ class GeminiClient:
                 token = e.split(',')[0].strip()
                 if any(word.lower() in raw_text.lower() for word in token.split() if len(word) > 4):
                     exclusoes.append(e)
-            if not exclusoes:
+            if not exclusoes and is_demo_sample:
                 exclusoes = auto_excs[:4]
         else:
             cobs_candidates = [
@@ -407,7 +476,7 @@ class GeminiClient:
                 token = c.split('(')[0].strip()
                 if any(word.lower() in raw_text.lower() for word in token.split() if len(word) > 4):
                     coberturas.append(c)
-            if not coberturas:
+            if not coberturas and is_demo_sample:
                 coberturas = cobs_candidates[:6]
 
             excs_candidates = [
@@ -423,7 +492,7 @@ class GeminiClient:
                 token = e.split(',')[0].strip()
                 if any(word.lower() in raw_text.lower() for word in token.split() if len(word) > 4):
                     exclusoes.append(e)
-            if not exclusoes:
+            if not exclusoes and is_demo_sample:
                 exclusoes = excs_candidates[:5]
 
         lower_raw = raw_text.lower()
@@ -468,8 +537,26 @@ class GeminiClient:
             ramo_descricao=ramo_desc,
             tipo_movimento=tipo_mov,
             tipo_movimento_descricao=tipo_desc,
-            metodo_extracao=metodo_extracao,
-            confianca_extracao=0.88
+            metodo_extracao="mock_fallback" if is_demo_sample else "heuristic_fallback",
+            confianca_extracao=0.88 if is_demo_sample else 0.35,
+            campos_nao_encontrados=[
+                campo for campo, valor in {
+                    "seguradora": seguradora,
+                    "segurado": segurado,
+                    "numero_apolice": num_apolice,
+                    "vigencia_inicio": vigencia_inicio,
+                    "vigencia_fim": vigencia_fim,
+                    "premio_total": premio,
+                    "limite_responsabilidade": limite,
+                    "franquia": franquia,
+                    "coberturas": coberturas,
+                    "exclusoes": exclusoes,
+                    "retroatividade": retroatividade,
+                    "territorio": territorio,
+                    "legislacao_aplicavel": legislacao,
+                    "cod_ramo": cod_ramo,
+                }.items() if valor in (None, "", [])
+            ]
         )
 
     def generate_audit_variance_justification(self, report: Any) -> str:
