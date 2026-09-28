@@ -71,3 +71,16 @@ def test_demo_fixture_keeps_explicit_mock_fallback_scope():
 
     assert dao.metodo_extracao == "mock_fallback"
     assert dao.cod_ramo == "0378"
+
+
+def test_long_documents_are_split_into_overlapping_chunks_without_truncation():
+    client = _offline_client()
+    text = "".join(f"--- PÁGINA {i} ---\n" + ("conteudo " * 7000) + "\n" for i in range(1, 7))
+
+    chunks = client._chunk_text(text, max_chars=15000, overlap=1000)
+
+    assert len(chunks) > 1
+    assert chunks[0]
+    assert chunks[-1]
+    assert "PÁGINA 6" in chunks[-1]
+    assert sum(len(chunk) for chunk in chunks) > len(text)
