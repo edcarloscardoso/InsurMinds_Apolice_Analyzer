@@ -540,8 +540,7 @@ class GeminiClient:
 
         legislacao = None
         match_foro = re.search(
-            r'(?:foro|jurisdi[cç][aã]o|legisla[cç][aã]o(?:s+aplic[aá]vel)?)s*[:-]?s*([^
-]{3,160})',
+            r'(?:foro|jurisdi[cç][aã]o|legisla[cç][aã]o(?:\s+aplic[aá]vel)?)\s*[:\-]?\s*([^\n\r]{3,160})',
             raw_text,
             re.IGNORECASE
         )
