@@ -51,7 +51,7 @@ def calculate_claims_variance(
     periodo_referencia: str = "08/2026"
 ) -> AuditoriaVarianceReport:
     """Calcula a variação contábil consolidada, agrupada por Ramo SUSEP, identificando os maiores ofensores.
-    
+
     Atende aos requisitos de justificativa de variação para SUSEP e relatórios de auditoria externa.
     """
     if not sinistros:
@@ -123,7 +123,7 @@ def calculate_claims_variance(
 
     # 4. Geração da Justificativa Técnica Preliminar
     sinal = "+" if delta_global >= 0 else ""
-    
+
     ramo_info = f"Ramo {ramo_maior_ofensor.cod_ramo} — {ramo_maior_ofensor.ramo_nome}" if ramo_maior_ofensor else "N/A"
     ramo_delta = f"{sinal}R$ {ramo_maior_ofensor.delta_absoluto:,.2f} ({sinal}{ramo_maior_ofensor.delta_percentual:.2f}%)" if ramo_maior_ofensor else "R$ 0,00"
     ramo_share = f"{ramo_maior_ofensor.share_na_variacao_total:.1f}%" if ramo_maior_ofensor else "0%"
@@ -135,14 +135,14 @@ def calculate_claims_variance(
     sinistro_tipo = get_tipo_mov_name(sinistro_maior_ofensor.tipo_mov) if sinistro_maior_ofensor else "N/A"
 
     justificativa_md = f"""### 📌 Nota Explicativa de Variação de Provisão de Sinistros (SUSEP / Auditoria)
-**Período de Referência:** {periodo_referencia}  
+**Período de Referência:** {periodo_referencia}
 **Saldo Anterior:** R$ {total_anterior_geral:,.2f} | **Saldo Atualizado:** R$ {total_atual_geral:,.2f} | **Variação Líquida:** {sinal}R$ {delta_global:,.2f} ({sinal}{delta_global_percentual:.2f}%)
 
 #### 1. Ramo Maior Ofensor
 A variação global na provisão de sinistros no período foi explicada precipuamente pelo **{ramo_info}**, o qual apresentou uma oscilação líquida de **{ramo_delta}**, representando **{ramo_share} da variação total observada na carteira**.
 
 #### 2. Apólice e Sinistro de Maior Impacto (Maior Ofensor da Carteira)
-O evento com maior repercussão individual no fechamento contábil foi o **{sinistro_info}**, que sofreu um ajuste de provisão de **{sinistro_delta}**. 
+O evento com maior repercussão individual no fechamento contábil foi o **{sinistro_info}**, que sofreu um ajuste de provisão de **{sinistro_delta}**.
 * **Motivo/Causa:** {sinistro_causa}
 * **Status Processual:** {sinistro_status}
 * **Tipo de Movimento:** {sinistro_tipo}

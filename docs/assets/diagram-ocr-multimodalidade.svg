@@ -1,0 +1,354 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 860" width="1400" height="860">
+  <defs>
+    <!-- Background Gradients -->
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#081729"/>
+      <stop offset="50%" stop-color="#0D223B"/>
+      <stop offset="100%" stop-color="#061220"/>
+    </linearGradient>
+
+    <!-- Header Gradient -->
+    <linearGradient id="headerGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#8B5CF6" stop-opacity="0"/>
+      <stop offset="25%" stop-color="#8B5CF6"/>
+      <stop offset="50%" stop-color="#2864C7"/>
+      <stop offset="75%" stop-color="#00D2FF"/>
+      <stop offset="100%" stop-color="#00D2FF" stop-opacity="0"/>
+    </linearGradient>
+
+    <!-- Card Gradients -->
+    <linearGradient id="cardInput" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#142B48"/>
+      <stop offset="100%" stop-color="#0E1E34"/>
+    </linearGradient>
+
+    <linearGradient id="cardPdf" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#102D4A"/>
+      <stop offset="100%" stop-color="#0A1D30"/>
+    </linearGradient>
+
+    <linearGradient id="cardGemini" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#261A45"/>
+      <stop offset="100%" stop-color="#140D2B"/>
+    </linearGradient>
+
+    <linearGradient id="cardTesseract" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0E3345"/>
+      <stop offset="100%" stop-color="#08202C"/>
+    </linearGradient>
+
+    <linearGradient id="cardResolver" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#162A40"/>
+      <stop offset="100%" stop-color="#0D1A2A"/>
+    </linearGradient>
+
+    <!-- Filters -->
+    <filter id="cardShadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="5" stdDeviation="7" flood-color="#000000" flood-opacity="0.45"/>
+    </filter>
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="3" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+
+    <!-- Markers -->
+    <marker id="arrowCyan" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
+      <path d="M 1 1 L 7 4 L 1 7 Z" fill="#00D2FF"/>
+    </marker>
+    <marker id="arrowPurple" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
+      <path d="M 1 1 L 7 4 L 1 7 Z" fill="#A855F7"/>
+    </marker>
+    <marker id="arrowTeal" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
+      <path d="M 1 1 L 7 4 L 1 7 Z" fill="#14B8A6"/>
+    </marker>
+    <marker id="arrowGold" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
+      <path d="M 1 1 L 7 4 L 1 7 Z" fill="#FBBF24"/>
+    </marker>
+
+    <!-- Patterns -->
+    <pattern id="gridPattern" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#163152" stroke-width="0.5" opacity="0.35"/>
+    </pattern>
+    <pattern id="dotPattern" width="20" height="20" patternUnits="userSpaceOnUse">
+      <circle cx="10" cy="10" r="0.8" fill="#2864C7" opacity="0.18"/>
+    </pattern>
+  </defs>
+
+  <!-- ================= BACKGROUND ================= -->
+  <rect width="1400" height="860" fill="url(#bgGrad)"/>
+  <rect width="1400" height="860" fill="url(#gridPattern)"/>
+  <rect width="1400" height="860" fill="url(#dotPattern)"/>
+
+  <!-- Radial Glow Accents -->
+  <ellipse cx="200" cy="250" rx="350" ry="250" fill="#2864C7" opacity="0.05"/>
+  <ellipse cx="1100" cy="300" rx="350" ry="250" fill="#8B5CF6" opacity="0.05"/>
+  <ellipse cx="700" cy="650" rx="400" ry="250" fill="#0B8A84" opacity="0.05"/>
+
+  <!-- Top Accent Line -->
+  <rect x="0" y="0" width="1400" height="3" fill="url(#headerGrad)"/>
+
+  <!-- ================= HEADER SECTION ================= -->
+  <g transform="translate(60, 45)">
+    <!-- Pill Badge -->
+    <rect x="0" y="0" width="310" height="26" rx="13" fill="#171A38" stroke="#8B5CF6" stroke-width="1"/>
+    <circle cx="14" cy="13" r="4" fill="#A855F7" filter="url(#glow)"/>
+    <text x="26" y="17" font-family="'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="11" font-weight="700" fill="#C4B5FD" letter-spacing="1.5">PIPELINE DE EXTRAÇÃO HÍBRIDA &amp; MULTIMODAL</text>
+
+    <!-- Main Title -->
+    <text x="0" y="58" font-family="'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="28" font-weight="800" fill="#FFFFFF" letter-spacing="0.5">
+      Roteamento de OCR e Multimodalidade
+    </text>
+
+    <!-- Subtitle -->
+    <text x="0" y="82" font-family="'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="13.5" font-weight="400" fill="#8FAFCF">
+      Estratégia dinâmica de extração baseada na natureza do documento (digital vs escaneado), conectividade e presença de chaves de API.
+    </text>
+  </g>
+
+  <!-- ================= INPUT NODE (LEFT) ================= -->
+  <g transform="translate(60, 200)" filter="url(#cardShadow)">
+    <rect width="250" height="420" rx="12" fill="url(#cardInput)" stroke="#265287" stroke-width="1.5"/>
+    <rect x="0" y="0" width="250" height="5" rx="2" fill="#2864C7"/>
+
+    <text x="20" y="32" font-family="'Segoe UI', Arial, sans-serif" font-size="11" font-weight="700" fill="#60A5FA" letter-spacing="1.2">DOCUMENTO DE ENTRADA</text>
+    <text x="20" y="58" font-family="'Segoe UI', Arial, sans-serif" font-size="19" font-weight="700" fill="#FFFFFF">Ingestão &amp; Tipo</text>
+    <text x="20" y="76" font-family="'Courier New', monospace" font-size="11" fill="#7DD3FC">ReceptionAgent validated</text>
+
+    <line x1="20" y1="90" x2="230" y2="90" stroke="#1D3E66" stroke-width="1"/>
+
+    <!-- Format Item 1: PDF Digital -->
+    <g transform="translate(20, 110)">
+      <rect width="210" height="80" rx="8" fill="#0C1D33" stroke="#1E4575" stroke-width="1"/>
+      <rect x="12" y="14" width="8" height="8" rx="2" fill="#00D2FF"/>
+      <text x="28" y="22" font-family="'Segoe UI', Arial, sans-serif" font-size="13" font-weight="700" fill="#FFFFFF">PDF com Texto Digital</text>
+      <text x="28" y="40" font-family="'Segoe UI', Arial, sans-serif" font-size="11" fill="#CADDF2">• Camada de texto nativa</text>
+      <text x="28" y="55" font-family="'Segoe UI', Arial, sans-serif" font-size="11" fill="#CADDF2">• Bounding-boxes vetoriais</text>
+      <text x="28" y="70" font-family="'Courier New', monospace" font-size="10" fill="#58A3E0">%PDF- header (digital stream)</text>
+    </g>
+
+    <!-- Format Item 2: Scan / Images -->
+    <g transform="translate(20, 210)">
+      <rect width="210" height="95" rx="8" fill="#0C1D33" stroke="#2B3A68" stroke-width="1"/>
+      <rect x="12" y="14" width="8" height="8" rx="2" fill="#A855F7"/>
+      <text x="28" y="22" font-family="'Segoe UI', Arial, sans-serif" font-size="13" font-weight="700" fill="#FFFFFF">Imagem / PDF Escaneado</text>
+      <text x="28" y="40" font-family="'Segoe UI', Arial, sans-serif" font-size="11" fill="#CADDF2">• Páginas rasterizadas / bitmap</text>
+      <text x="28" y="55" font-family="'Segoe UI', Arial, sans-serif" font-size="11" fill="#CADDF2">• Sem camada de texto extraível</text>
+      <text x="28" y="70" font-family="'Segoe UI', Arial, sans-serif" font-size="11" fill="#CADDF2">• PNG (\x89PNG) ou JPG (\xFF\xD8)</text>
+      <text x="28" y="85" font-family="'Courier New', monospace" font-size="10" fill="#C4B5FD">Requer OCR ou Vision</text>
+    </g>
+
+    <!-- Bottom security pill -->
+    <g transform="translate(20, 370)">
+      <rect width="210" height="30" rx="6" fill="#091A2E" stroke="#16395E" stroke-width="1"/>
+      <text x="105" y="19" font-family="'Segoe UI', Arial, sans-serif" font-size="11" font-weight="600" fill="#80B5EA" text-anchor="middle">
+        Validação Prévia por Magic Bytes
+      </text>
+    </g>
+  </g>
+
+  <!-- ================= BRANCH 1: PDF DIGITAL (TOP RIGHT) ================= -->
+  <!-- Connector from Input to Branch 1 -->
+  <path d="M 310 260 L 420 260" fill="none" stroke="#00D2FF" stroke-width="2.5" marker-end="url(#arrowCyan)"/>
+  <text x="325" y="250" font-family="'Segoe UI', Arial, sans-serif" font-size="10.5" font-weight="700" fill="#00D2FF">texto digital</text>
+
+  <g transform="translate(430, 160)" filter="url(#cardShadow)">
+    <rect width="910" height="175" rx="12" fill="url(#cardPdf)" stroke="#1B4D7E" stroke-width="1.5"/>
+    <rect x="0" y="0" width="910" height="5" rx="2" fill="#00D2FF"/>
+
+    <g transform="translate(25, 22)">
+      <rect x="0" y="0" width="135" height="22" rx="4" fill="#0D2644" stroke="#1D538C" stroke-width="1"/>
+      <text x="67" y="15" font-family="'Segoe UI', Arial, sans-serif" font-size="10.5" font-weight="700" fill="#71BFF0" text-anchor="middle">ROTA VETORIAL DIRETA</text>
+
+      <text x="150" y="16" font-family="'Segoe UI', Arial, sans-serif" font-size="18" font-weight="700" fill="#FFFFFF">pdfplumber (Motor Primário de Alta Fidelidade)</text>
+      <text x="640" y="16" font-family="'Courier New', monospace" font-size="11" fill="#38BDF8">agents/extractor_agent.py</text>
+    </g>
+
+    <line x1="25" y1="58" x2="885" y2="58" stroke="#15365A" stroke-width="1"/>
+
+    <!-- 3 Columns inside Card 1 -->
+    <g transform="translate(25, 75)">
+      <!-- Col 1 -->
+      <g transform="translate(0, 0)">
+        <text x="0" y="15" font-family="'Segoe UI', Arial, sans-serif" font-size="12" font-weight="700" fill="#60A5FA">Extração de Texto &amp; Posição</text>
+        <text x="0" y="35" font-family="'Segoe UI', Arial, sans-serif" font-size="11.5" fill="#CADDF2">• Extração precisa de caracteres e palavras</text>
+        <text x="0" y="52" font-family="'Segoe UI', Arial, sans-serif" font-size="11.5" fill="#CADDF2">• Preservação de quebras de parágrafo</text>
+        <text x="0" y="69" font-family="'Segoe UI', Arial, sans-serif" font-size="11.5" fill="#CADDF2">• Registro imediato do número de página</text>
+      </g>
+
+      <!-- Col 2 -->
+      <g transform="translate(300, 0)">
+        <text x="0" y="15" font-family="'Segoe UI', Arial, sans-serif" font-size="12" font-weight="700" fill="#60A5FA">Detecção de Tabelas</text>
+        <text x="0" y="35" font-family="'Segoe UI', Arial, sans-serif" font-size="11.5" fill="#CADDF2">• Mapeamento de linhas e colunas D&amp;O</text>
+        <text x="0" y="52" font-family="'Segoe UI', Arial, sans-serif" font-size="11.5" fill="#CADDF2">• Extração de limites (LMG) e prêmios</text>
+        <text x="0" y="69" font-family="'Segoe UI', Arial, sans-serif" font-size="11.5" fill="#CADDF2">• Conciliação tabular sem OCR</text>
+      </g>
+
+      <!-- Col 3 -->
+      <g transform="translate(600, 0)">
+        <text x="0" y="15" font-family="'Segoe UI', Arial, sans-serif" font-size="12" font-weight="700" fill="#60A5FA">Vantagens &amp; Performance</text>
+        <text x="0" y="35" font-family="'Segoe UI', Arial, sans-serif" font-size="11.5" fill="#34D399">• Custo Zero de API (100% local)</text>
+        <text x="0" y="52" font-family="'Segoe UI', Arial, sans-serif" font-size="11.5" fill="#34D399">• Processamento vetorial direto em memória</text>
+        <text x="0" y="69" font-family="'Segoe UI', Arial, sans-serif" font-size="11.5" fill="#34D399">• Confiança de extração 1.0 (ground-truth)</text>
+      </g>
+    </g>
+  </g>
+
+  <!-- ================= BRANCH 2: IMAGENS & SCANS (BOTTOM RIGHT) ================= -->
+  <!-- Connector from Input to Branch 2 -->
+  <path d="M 310 460 L 370 460 L 370 540 L 420 540" fill="none" stroke="#A855F7" stroke-width="2.5" marker-end="url(#arrowPurple)"/>
+  <text x="325" y="450" font-family="'Segoe UI', Arial, sans-serif" font-size="10.5" font-weight="700" fill="#C4B5FD">scan / imagem</text>
+
+  <!-- Sub-branch 2A: Gemini Multimodal Vision -->
+  <g transform="translate(430, 365)" filter="url(#cardShadow)">
+    <rect width="440" height="255" rx="12" fill="url(#cardGemini)" stroke="#4C2882" stroke-width="1.5"/>
+    <rect x="0" y="0" width="440" height="5" rx="2" fill="#8B5CF6"/>
+
+    <g transform="translate(20, 20)">
+      <rect x="0" y="0" width="165" height="22" rx="4" fill="#1F133B" stroke="#5E2EA6" stroke-width="1"/>
+      <text x="82" y="15" font-family="'Segoe UI', Arial, sans-serif" font-size="10.5" font-weight="700" fill="#D8B4FE" text-anchor="middle">MODO ONLINE (API KEY)</text>
+
+      <text x="0" y="50" font-family="'Segoe UI', Arial, sans-serif" font-size="17" font-weight="700" fill="#FFFFFF">Google Gemini 2.0 Vision</text>
+      <text x="0" y="68" font-family="'Courier New', monospace" font-size="10.5" fill="#C4B5FD">gemini-flash-lite-latest · google-genai</text>
+    </g>
+
+    <line x1="20" y1="98" x2="420" y2="98" stroke="#361C61" stroke-width="1"/>
+
+    <g transform="translate(20, 115)">
+      <circle cx="5" cy="5" r="3" fill="#A855F7"/>
+      <text x="16" y="9" font-family="'Segoe UI', Arial, sans-serif" font-size="11.5" fill="#E9D5FF">Compreensão semântica multimodal da imagem</text>
+
+      <circle cx="5" cy="27" r="3" fill="#A855F7"/>
+      <text x="16" y="31" font-family="'Segoe UI', Arial, sans-serif" font-size="11.5" fill="#E9D5FF">Interpretação de layouts jurídicos complexos</text>
+
+      <circle cx="5" cy="49" r="3" fill="#A855F7"/>
+      <text x="16" y="53" font-family="'Segoe UI', Arial, sans-serif" font-size="11.5" fill="#E9D5FF">Structured Output validado via Pydantic v2</text>
+
+      <circle cx="5" cy="71" r="3" fill="#A855F7"/>
+      <text x="16" y="75" font-family="'Segoe UI', Arial, sans-serif" font-size="11.5" fill="#E9D5FF">Ativação automática via GOOGLE_API_KEY</text>
+    </g>
+
+    <g transform="translate(20, 215)">
+      <rect width="125" height="22" rx="4" fill="#1C1033" stroke="#48227F" stroke-width="1"/>
+      <text x="62" y="15" font-family="'Segoe UI', Arial, sans-serif" font-size="10" font-weight="600" fill="#C4B5FD" text-anchor="middle">Zero Alucinação</text>
+
+      <rect x="135" y="0" width="130" height="22" rx="4" fill="#1C1033" stroke="#48227F" stroke-width="1"/>
+      <text x="200" y="15" font-family="'Segoe UI', Arial, sans-serif" font-size="10" font-weight="600" fill="#C4B5FD" text-anchor="middle">Análise de Carimbo</text>
+
+      <rect x="275" y="0" width="125" height="22" rx="4" fill="#1C1033" stroke="#48227F" stroke-width="1"/>
+      <text x="337" y="15" font-family="'Segoe UI', Arial, sans-serif" font-size="10" font-weight="600" fill="#C4B5FD" text-anchor="middle">Vision Reasoning</text>
+    </g>
+  </g>
+
+  <!-- Sub-branch 2B: PyMuPDF + Tesseract Local -->
+  <g transform="translate(895, 365)" filter="url(#cardShadow)">
+    <rect width="445" height="255" rx="12" fill="url(#cardTesseract)" stroke="#165666" stroke-width="1.5"/>
+    <rect x="0" y="0" width="445" height="5" rx="2" fill="#0B8A84"/>
+
+    <g transform="translate(20, 20)">
+      <rect x="0" y="0" width="175" height="22" rx="4" fill="#09282F" stroke="#125866" stroke-width="1"/>
+      <text x="87" y="15" font-family="'Segoe UI', Arial, sans-serif" font-size="10.5" font-weight="700" fill="#5EEAD4" text-anchor="middle">MODO OFFLINE / CONTINGÊNCIA</text>
+
+      <text x="0" y="50" font-family="'Segoe UI', Arial, sans-serif" font-size="17" font-weight="700" fill="#FFFFFF">PyMuPDF + Tesseract OCR</text>
+      <text x="0" y="68" font-family="'Courier New', monospace" font-size="10.5" fill="#5EEAD4">pymupdf (fitz) · C-bindings nativos</text>
+    </g>
+
+    <line x1="20" y1="98" x2="425" y2="98" stroke="#10424A" stroke-width="1"/>
+
+    <g transform="translate(20, 115)">
+      <circle cx="5" cy="5" r="3" fill="#14B8A6"/>
+      <text x="16" y="9" font-family="'Segoe UI', Arial, sans-serif" font-size="11.5" fill="#CCFBF1">Renderização do PDF em bitmap (300 DPI)</text>
+
+      <circle cx="5" cy="27" r="3" fill="#14B8A6"/>
+      <text x="16" y="31" font-family="'Segoe UI', Arial, sans-serif" font-size="11.5" fill="#CCFBF1">OCR local executado diretamente em memória C</text>
+
+      <circle cx="5" cy="49" r="3" fill="#14B8A6"/>
+      <text x="16" y="53" font-family="'Segoe UI', Arial, sans-serif" font-size="11.5" fill="#CCFBF1">100% Offline: sem tráfego de dados para nuvem</text>
+
+      <circle cx="5" cy="71" r="3" fill="#14B8A6"/>
+      <text x="16" y="75" font-family="'Segoe UI', Arial, sans-serif" font-size="11.5" fill="#CCFBF1">Privacidade total para apólices confidenciais</text>
+    </g>
+
+    <g transform="translate(20, 215)">
+      <rect width="125" height="22" rx="4" fill="#082226" stroke="#0E4E57" stroke-width="1"/>
+      <text x="62" y="15" font-family="'Segoe UI', Arial, sans-serif" font-size="10" font-weight="600" fill="#5EEAD4" text-anchor="middle">Zero Internet</text>
+
+      <rect x="135" y="0" width="130" height="22" rx="4" fill="#082226" stroke="#0E4E57" stroke-width="1"/>
+      <text x="200" y="15" font-family="'Segoe UI', Arial, sans-serif" font-size="10" font-weight="600" fill="#5EEAD4" text-anchor="middle">Libtesseract 5.x</text>
+
+      <rect x="275" y="0" width="130" height="22" rx="4" fill="#082226" stroke="#0E4E57" stroke-width="1"/>
+      <text x="340" y="15" font-family="'Segoe UI', Arial, sans-serif" font-size="10" font-weight="600" fill="#5EEAD4" text-anchor="middle">Privacidade Total</text>
+    </g>
+  </g>
+
+  <!-- ================= SUB-PANEL: RESOLVE_TESSDATA_DIR & CROSS-PLATFORM ================= -->
+  <g transform="translate(430, 640)" filter="url(#cardShadow)">
+    <rect width="910" height="135" rx="10" fill="url(#cardResolver)" stroke="#224263" stroke-width="1.5"/>
+
+    <!-- Header bar -->
+    <g transform="translate(20, 18)">
+      <rect x="0" y="0" width="8" height="16" rx="2" fill="#F59E0B"/>
+      <text x="16" y="13" font-family="'Segoe UI', Arial, sans-serif" font-size="12" font-weight="700" fill="#FFFFFF">
+        RESOLUÇÃO AUTOMÁTICA DE CAMINHOS &amp; IDIOMAS (core/config.py)
+      </text>
+      <text x="560" y="13" font-family="'Courier New', monospace" font-size="11" fill="#FBBF24">
+        resolve_tessdata_dir() &amp; get_ocr_language()
+      </text>
+    </g>
+
+    <line x1="20" y1="42" x2="890" y2="42" stroke="#183654" stroke-width="1"/>
+
+    <!-- 3 Path Resolver Columns -->
+    <g transform="translate(20, 58)">
+      <!-- Linux Paths -->
+      <g transform="translate(0, 0)">
+        <text x="0" y="14" font-family="'Segoe UI', Arial, sans-serif" font-size="11.5" font-weight="700" fill="#93C5FD">
+          🐧 Linux / openSUSE / Ubuntu:
+        </text>
+        <text x="0" y="32" font-family="'Courier New', monospace" font-size="10.5" fill="#CADDF2">• /usr/share/tessdata</text>
+        <text x="0" y="47" font-family="'Courier New', monospace" font-size="10.5" fill="#CADDF2">• /usr/share/tesseract-ocr/5/tessdata</text>
+        <text x="0" y="62" font-family="'Courier New', monospace" font-size="10.5" fill="#CADDF2">• /usr/local/share/tessdata</text>
+      </g>
+
+      <!-- Windows Paths -->
+      <g transform="translate(320, 0)">
+        <text x="0" y="14" font-family="'Segoe UI', Arial, sans-serif" font-size="11.5" font-weight="700" fill="#93C5FD">
+          🪟 Windows 11 (Auto-detect):
+        </text>
+        <text x="0" y="32" font-family="'Courier New', monospace" font-size="10.5" fill="#CADDF2">• C:\Program Files\Tesseract-OCR\tessdata</text>
+        <text x="0" y="47" font-family="'Courier New', monospace" font-size="10.5" fill="#CADDF2">• %LOCALAPPDATA%\Programs\Tesseract-OCR\...</text>
+        <text x="0" y="62" font-family="'Courier New', monospace" font-size="10.5" fill="#CADDF2">• Fallback via TESSERACT_CMD ou TESSDATA_PREFIX</text>
+      </g>
+
+      <!-- Language detection -->
+      <g transform="translate(630, 0)">
+        <text x="0" y="14" font-family="'Segoe UI', Arial, sans-serif" font-size="11.5" font-weight="700" fill="#FBBF24">
+          🌐 Seleção de Idioma OCR:
+        </text>
+        <text x="0" y="32" font-family="'Segoe UI', Arial, sans-serif" font-size="11" fill="#CADDF2">
+          1. Verifica se <tspan font-family="'Courier New', monospace" fill="#5EEAD4">por.traineddata</tspan> existe
+        </text>
+        <text x="0" y="48" font-family="'Segoe UI', Arial, sans-serif" font-size="11" fill="#CADDF2">
+          2. Se sim: ativa <tspan font-family="'Courier New', monospace" fill="#34D399">"por+eng"</tspan> (Português D&amp;O)
+        </text>
+        <text x="0" y="64" font-family="'Segoe UI', Arial, sans-serif" font-size="11" fill="#CADDF2">
+          3. Senão: fallback seguro para <tspan font-family="'Courier New', monospace" fill="#FBBF24">"eng"</tspan>
+        </text>
+      </g>
+    </g>
+  </g>
+
+  <!-- ================= BOTTOM STATUS BAR ================= -->
+  <g transform="translate(60, 795)">
+    <rect width="1280" height="34" rx="8" fill="#0A1828" stroke="#163152" stroke-width="1"/>
+
+    <text x="25" y="21" font-family="'Segoe UI', Arial, sans-serif" font-size="11" font-weight="700" fill="#5885B5">CONVERGÊNCIA ANALÍTICA:</text>
+
+    <text x="210" y="21" font-family="'Segoe UI', Arial, sans-serif" font-size="11" fill="#A0C0E0">Ambos os motores produzem DocumentState normalizado</text>
+    <circle cx="585" cy="17" r="2.5" fill="#2864C7"/>
+
+    <text x="605" y="21" font-family="'Segoe UI', Arial, sans-serif" font-size="11" fill="#A0C0E0">Proveniência Rastreável (method: pdfplumber | gemini_vision | ocr)</text>
+    <circle cx="1065" cy="17" r="2.5" fill="#2864C7"/>
+
+    <text x="1085" y="21" font-family="'Segoe UI', Arial, sans-serif" font-size="11" font-weight="600" fill="#00D2FF">Sem Vendor Lock-in</text>
+  </g>
+</svg>

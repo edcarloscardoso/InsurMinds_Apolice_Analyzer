@@ -30,7 +30,7 @@ class DatabaseManager:
         """Inicializa as tabelas e índices relacionais caso não existam."""
         with self._get_connection() as conn:
             cursor = conn.cursor()
-            
+
             # Tabela de Apólices Ingeridas
             cursor.execute("""
                 CREATE TABLE IF NOT EXISTS apolices (
@@ -40,6 +40,7 @@ class DatabaseManager:
                     segurado TEXT,
                     seguradora TEXT,
                     numero_apolice TEXT,
+                    processo_susep TEXT,
                     vigencia_inicio TEXT,
                     vigencia_fim TEXT,
                     premio_total TEXT,
@@ -53,8 +54,9 @@ class DatabaseManager:
                     legislacao_aplicavel TEXT,
                     cod_ramo TEXT DEFAULT '0378',
                     ramo_descricao TEXT DEFAULT 'Responsabilidade Civil D&O',
-                    tipo_movimento TEXT DEFAULT '101',
-                    tipo_movimento_descricao TEXT DEFAULT 'Emissão de Apólice',
+                    tipo_movimento TEXT,
+                    tipo_movimento_descricao TEXT,
+                    document_type TEXT DEFAULT 'unknown',
                     metodo_extracao TEXT,
                     confianca_extracao REAL,
                     campos_nao_encontrados_json TEXT,
@@ -69,8 +71,10 @@ class DatabaseManager:
             novas_colunas = [
                 ("cod_ramo", "TEXT DEFAULT '0378'"),
                 ("ramo_descricao", "TEXT DEFAULT 'Responsabilidade Civil D&O'"),
-                ("tipo_movimento", "TEXT DEFAULT '101'"),
-                ("tipo_movimento_descricao", "TEXT DEFAULT 'Emissão de Apólice'")
+                ("tipo_movimento", "TEXT"),
+                ("tipo_movimento_descricao", "TEXT"),
+                ("processo_susep", "TEXT"),
+                ("document_type", "TEXT DEFAULT 'unknown'")
             ]
             for nome_col, tipo_col in novas_colunas:
                 if nome_col not in colunas_existentes:
@@ -92,13 +96,37 @@ class DatabaseManager:
                 )
             """)
 
+            # Tabela Normalizada de Evidências Contratuais e Rastreabilidade (Fase 3)
+            cursor.execute("""
+                CREATE TABLE IF NOT EXISTS policy_evidence (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    policy_id TEXT NOT NULL,
+                    field_name TEXT NOT NULL,
+                    value TEXT,
+                    page INTEGER,
+                    page_end INTEGER,
+                    section TEXT,
+                    snippet TEXT,
+                    method TEXT,
+                    confidence REAL,
+                    chunk_index INTEGER,
+                    char_start INTEGER,
+                    char_end INTEGER,
+                    is_conflict INTEGER DEFAULT 0,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    FOREIGN KEY(policy_id) REFERENCES apolices(id) ON DELETE CASCADE
+                )
+            """)
+
             # Índices de performance
             cursor.execute("CREATE INDEX IF NOT EXISTS idx_apolices_seguradora ON apolices(seguradora)")
             cursor.execute("CREATE INDEX IF NOT EXISTS idx_apolices_segurado ON apolices(segurado)")
             cursor.execute("CREATE INDEX IF NOT EXISTS idx_apolices_ramo ON apolices(cod_ramo)")
             cursor.execute("CREATE INDEX IF NOT EXISTS idx_apolices_tipo_mov ON apolices(tipo_movimento)")
             cursor.execute("CREATE INDEX IF NOT EXISTS idx_comparacoes_pares ON comparacoes(apolice_a_id, apolice_b_id)")
-            
+            cursor.execute("CREATE INDEX IF NOT EXISTS idx_policy_evidence_policy ON policy_evidence(policy_id)")
+            cursor.execute("CREATE INDEX IF NOT EXISTS idx_policy_evidence_field ON policy_evidence(policy_id, field_name)")
+
             conn.commit()
 
     def save_apolice(self, dao: ApoliceDAO) -> str:
@@ -113,18 +141,19 @@ class DatabaseManager:
             cursor.execute("""
                 INSERT INTO apolices (
                     id, nome_arquivo, data_processamento, segurado, seguradora, numero_apolice,
-                    vigencia_inicio, vigencia_fim, premio_total, limite_responsabilidade, franquia,
-                    coberturas_json, exclusoes_json, clausulas_especiais_json, retroatividade,
+                    processo_susep, vigencia_inicio, vigencia_fim, premio_total, limite_responsabilidade,
+                    franquia, coberturas_json, exclusoes_json, clausulas_especiais_json, retroatividade,
                     territorio, legislacao_aplicavel, cod_ramo, ramo_descricao, tipo_movimento,
                     tipo_movimento_descricao, metodo_extracao, confianca_extracao,
                     campos_nao_encontrados_json, dados_completos_json
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 ON CONFLICT(id) DO UPDATE SET
                     nome_arquivo = excluded.nome_arquivo,
                     data_processamento = excluded.data_processamento,
                     segurado = excluded.segurado,
                     seguradora = excluded.seguradora,
                     numero_apolice = excluded.numero_apolice,
+                    processo_susep = excluded.processo_susep,
                     vigencia_inicio = excluded.vigencia_inicio,
                     vigencia_fim = excluded.vigencia_fim,
                     premio_total = excluded.premio_total,
@@ -151,6 +180,7 @@ class DatabaseManager:
                 dao.segurado,
                 dao.seguradora,
                 dao.numero_apolice,
+                dao.processo_susep,
                 dao.vigencia_inicio,
                 dao.vigencia_fim,
                 dao.premio_total,
@@ -162,17 +192,92 @@ class DatabaseManager:
                 dao.retroatividade,
                 dao.territorio,
                 dao.legislacao_aplicavel,
-                dao.cod_ramo or "0378",
-                dao.ramo_descricao or "Responsabilidade Civil D&O",
-                dao.tipo_movimento or "101",
-                dao.tipo_movimento_descricao or "Emissão de Apólice",
+                dao.cod_ramo,
+                dao.ramo_descricao,
+                dao.tipo_movimento,
+                dao.tipo_movimento_descricao,
                 dao.metodo_extracao,
                 dao.confianca_extracao,
                 json.dumps(dao.campos_nao_encontrados, ensure_ascii=False),
                 dados_completos
             ))
+
+            # Persistência normalizada e idempotente de evidências (Fase 3)
+            cursor.execute("DELETE FROM policy_evidence WHERE policy_id = ?", (dao.id,))
+
+            # 1. Evidências principais consolidadas
+            for field_name, ev in (dao.evidencias or {}).items():
+                if ev is None:
+                    continue
+                val = getattr(dao, field_name, None)
+                if isinstance(val, (list, dict)):
+                    val_str = json.dumps(val, ensure_ascii=False)
+                else:
+                    val_str = str(val) if val is not None else None
+
+                cursor.execute("""
+                    INSERT INTO policy_evidence (
+                        policy_id, field_name, value, page, page_end, section,
+                        snippet, method, confidence, chunk_index, char_start, char_end, is_conflict
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0)
+                """, (
+                    dao.id,
+                    field_name,
+                    val_str,
+                    ev.page,
+                    ev.page_end,
+                    ev.section,
+                    ev.snippet,
+                    ev.method,
+                    ev.confidence,
+                    ev.chunk_index,
+                    ev.char_start,
+                    ev.char_end
+                ))
+
+            # 2. Evidências de conflito (quando divergências concorrentes foram detectadas)
+            for field_name, ev_list in (dao.evidencias_conflito or {}).items():
+                for ev in ev_list or []:
+                    if ev is None:
+                        continue
+                    cursor.execute("""
+                        INSERT INTO policy_evidence (
+                            policy_id, field_name, value, page, page_end, section,
+                            snippet, method, confidence, chunk_index, char_start, char_end, is_conflict
+                        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1)
+                    """, (
+                        dao.id,
+                        field_name,
+                        None,
+                        ev.page,
+                        ev.page_end,
+                        ev.section,
+                        ev.snippet,
+                        ev.method,
+                        ev.confidence,
+                        ev.chunk_index,
+                        ev.char_start,
+                        ev.char_end
+                    ))
+
             conn.commit()
             return dao.id
+
+    def get_policy_evidence(self, policy_id: str, field_name: Optional[str] = None) -> List[Dict[str, Any]]:
+        """Recupera os registros normalizados de evidência contratual para uma apólice."""
+        with self._get_connection() as conn:
+            cursor = conn.cursor()
+            if field_name:
+                cursor.execute(
+                    "SELECT * FROM policy_evidence WHERE policy_id = ? AND field_name = ? ORDER BY id",
+                    (policy_id, field_name)
+                )
+            else:
+                cursor.execute(
+                    "SELECT * FROM policy_evidence WHERE policy_id = ? ORDER BY id",
+                    (policy_id,)
+                )
+            return [dict(row) for row in cursor.fetchall()]
 
     def get_apolice_by_id(self, apolice_id: str) -> Optional[ApoliceDAO]:
         """Busca e desserializa uma apólice pelo seu ID único."""

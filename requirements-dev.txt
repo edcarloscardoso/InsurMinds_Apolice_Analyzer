@@ -1,0 +1,15 @@
+# InsurMinds Apólice Analyzer — Dependências de Testes, QA e Desenvolvimento
+# Compatibilidade: Python >= 3.10 (Linux x86_64, Windows 11 x86_64)
+
+# Herda todas as dependências de runtime
+-r requirements.txt
+
+# Framework de Testes Automatizados
+pytest>=8.0.0
+
+# Utilitário de Compilação de Apólices Sintéticas D&O (data/generate_samples.py)
+reportlab>=4.0.0
+
+# Automação de QA e Testes de Integração HTTP/CDP
+requests>=2.28.0
+websockets>=12.0.0

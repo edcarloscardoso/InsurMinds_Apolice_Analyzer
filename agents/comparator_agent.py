@@ -4,6 +4,7 @@ Responsabilidade: Execução de análise comparativa entre duas apólices D&O es
 import logging
 from core.schemas import ComparisonState
 from core.diff_engine import compare_policies
+from core.llm_client import llm_client
 
 logger = logging.getLogger(__name__)
 
@@ -18,7 +19,7 @@ def comparator_agent(state: ComparisonState) -> ComparisonState:
         return state
 
     try:
-        diff_result = compare_policies(state.apolice_a, state.apolice_b)
+        diff_result = compare_policies(state.apolice_a, state.apolice_b, llm_client=llm_client)
         state.diff_result = diff_result
         state.status = "comparado"
         logger.info(f"Agente 5: Comparação finalizada. Score de similaridade: {diff_result.score_similaridade}%")

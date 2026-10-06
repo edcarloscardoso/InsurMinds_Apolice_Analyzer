@@ -1,12 +1,21 @@
+# InsurMinds Apólice Analyzer — Dependências Oficiais de Runtime
+# Compatibilidade de Sistema: Python >= 3.10 (Linux x86_64, Windows 11 x86_64)
+
+# Interface Web e Visualização
 streamlit>=1.39.0
-langgraph>=0.2.0
-google-genai>=2.20.0
-pdfplumber>=0.11.0
-pydantic>=2.0.0
-python-dotenv>=1.0.0
-Pillow>=10.0.0
-pymupdf>=1.28.0
-reportlab>=4.0.0
-sqlalchemy>=2.0.0
-pytest>=8.0.0
 pandas>=2.0.0
+
+# Orquestração Multi-Agente e Schemas Estruturados
+langgraph>=0.2.0
+pydantic>=2.0.0
+
+# IA Generativa Oficial (Google Gemini SDK)
+google-genai>=2.20.0
+
+# Processamento de Documentos (PDF, Imagens e OCR Nativo)
+pdfplumber>=0.11.0
+pymupdf>=1.24.0
+Pillow>=10.0.0
+
+# Configuração e Variáveis de Ambiente
+python-dotenv>=1.0.0

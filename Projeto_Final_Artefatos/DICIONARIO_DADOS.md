@@ -107,4 +107,3 @@ Consolidação da ponte de variação contábil e justificativa executiva para S
 | `sinistro_maior_ofensor` | `SinistroItem` | Sinistro de maior materialidade individual da carteira. |
 | `variacao_por_ramo` | `List[RamoVarianceSummary]` | Distribuição das variações por Ramo SUSEP. |
 | `justificativa_auditoria_markdown` | `str` | Nota explicativa formal gerada para envio à SUSEP/Auditoria. |
-

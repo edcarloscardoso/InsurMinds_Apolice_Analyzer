@@ -1,329 +1,923 @@
-"""Design System & Harmonização de Cores para o Mercado Segurador e Ressegurador.
-Inspirado nos padrões visuais de líderes globais (Swiss Re, Munich Re, Lloyd's of London, Allianz e Chubb).
-Prioriza alta credibilidade, contraste executivo, sofisticação tipográfica e experiência do usuário (UX).
+"""Design System & Harmonização Visual — Insurance Intelligence v1.0.
+Implementa o ecossistema visual corporativo para a plataforma InsurMinds Apólice Analyzer.
+Fundo claro (#F5F7FA), superfícies brancas (#FFFFFF), azul marinho (#12304A), azul primário (#2864C7),
+tipografia Inter (UI) e IBM Plex Mono (Evidências literais), com hierarquia editorial e foco documental.
 """
 import streamlit as st
+from ui.tokens import COLORS, TYPOGRAPHY, SPACING, RADIUS, SHADOWS
+
+
+def render_html(html_str: str) -> None:
+    """Renderiza HTML corporativo no Streamlit removendo qualquer indentação inicial de linhas
+    para evitar que o parser CommonMark do Streamlit trate tags como blocos de código preformatado (<pre><code>).
+    """
+    clean_html = "\n".join(line.strip() for line in html_str.strip().splitlines())
+    st.markdown(clean_html, unsafe_allow_html=True)
 
 
 def apply_custom_styles():
-    """Injeta o ecossistema visual de alta fidelidade para o InsurMinds Apólice Analyzer."""
-    st.markdown("""
+    """Injeta a folha de estilos corporativa do Design System Insurance Intelligence v1.0."""
+    render_html(f"""
         <style>
         /* ====================================================================
-           1. TIPOGRAFIA & BASE GLOBAL (Inter & Plus Jakarta Sans)
+           1. TIPOGRAFIA & BASE GLOBAL (Inter & IBM Plex Mono)
            ==================================================================== */
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700;800&display=swap');
 
-        html, body, [class*="css"] {
-            font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif !important;
-            color: #0F172A;
-            background-color: #F8FAFC;
-        }
+        /* Canvas Global Claro Institucional */
+        html, body, .stApp, [data-testid="stApp"], [data-testid="stAppViewContainer"],
+        section.main, [data-testid="stMain"], .main, .block-container, [data-testid="stAppViewBlockContainer"] {{
+            font-family: {TYPOGRAPHY.FONT_UI} !important;
+            color: {COLORS.TEXT_MAIN} !important;
+            background-color: {COLORS.BACKGROUND} !important;
+            background: {COLORS.BACKGROUND} !important;
+        }}
 
-        /* Redução de espaçamentos superiores excessivos do Streamlit */
-        .block-container {
-            padding-top: 1.8rem !important;
+        header[data-testid="stHeader"] {{
+            background-color: rgba(245, 247, 250, 0.92) !important;
+            backdrop-filter: blur(8px) !important;
+            border-bottom: 1px solid {COLORS.BORDER} !important;
+        }}
+
+        /* Tipografia de Títulos e Parágrafos */
+        .stMarkdown, .stMarkdown p, .stMarkdown span, .stMarkdown div,
+        [data-testid="stMarkdownContainer"] p, [data-testid="stMarkdownContainer"] span {{
+            color: {COLORS.TEXT_MAIN} !important;
+            font-family: {TYPOGRAPHY.FONT_UI} !important;
+        }}
+
+        .stMarkdown h1, .stMarkdown h2, .stMarkdown h3, .stMarkdown h4, .stMarkdown h5, .stMarkdown h6,
+        h1, h2, h3, h4, h5, h6 {{
+            font-family: {TYPOGRAPHY.FONT_UI} !important;
+            color: {COLORS.PRIMARY_NAVY} !important;
+            letter-spacing: -0.3px !important;
+            font-weight: 600 !important;
+        }}
+
+        h1 {{ font-size: 24px !important; line-height: 32px !important; }}
+        h2 {{ font-size: 20px !important; line-height: 28px !important; }}
+        h3 {{ font-size: 16px !important; line-height: 24px !important; }}
+
+        /* Container Principal com Alinhamento Executivo */
+        .block-container {{
+            padding-top: 1.25rem !important;
             padding-bottom: 3.5rem !important;
-            max-width: 1280px !important;
-        }
+            max-width: 1380px !important;
+        }}
 
         /* ====================================================================
-           2. BANNER EXECUTIVO INSTITUCIONAL (Mercado Segurador & Ressegurador)
+           2. TOPBAR CORPORATIVA & IDENTIDADE
            ==================================================================== */
-        .insurminds-header {
-            background: linear-gradient(135deg, #0A192F 0%, #0F253E 50%, #16325B 100%);
-            border-bottom: 3px solid #C5A059; /* Dourado nobre de resseguro */
-            color: #FFFFFF;
-            padding: 26px 32px;
-            border-radius: 14px;
-            margin-bottom: 28px;
-            box-shadow: 0 10px 30px -5px rgba(10, 25, 47, 0.25), 0 4px 6px -2px rgba(10, 25, 47, 0.1);
-            position: relative;
-            overflow: hidden;
-        }
+        .im-topbar-brand {{
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 4px;
+        }}
 
-        .insurminds-header::after {
-            content: "";
-            position: absolute;
-            top: -40px;
-            right: -40px;
-            width: 180px;
-            height: 180px;
-            background: radial-gradient(circle, rgba(2, 132, 199, 0.2) 0%, rgba(2, 132, 199, 0) 70%);
-            pointer-events: none;
-        }
-
-        .insurminds-header .badge-tag {
+        .im-topbar-badge {{
             display: inline-block;
-            background: rgba(197, 160, 89, 0.18);
-            color: #F3E8C8;
-            border: 1px solid rgba(197, 160, 89, 0.4);
-            font-size: 11px;
+            background-color: #E2E8F0;
+            color: {COLORS.PRIMARY_NAVY};
+            font-size: 10px;
             font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 1px;
-            padding: 3px 10px;
-            border-radius: 20px;
-            margin-bottom: 8px;
-        }
+            padding: 2px 8px;
+            border-radius: {RADIUS.SM};
+            margin-bottom: 4px;
+        }}
 
-        .insurminds-header h1 {
-            color: #FFFFFF !important;
-            font-size: 26px !important;
-            font-weight: 800 !important;
+        .im-topbar-title {{
+            font-size: 18px !important;
+            font-weight: 700 !important;
+            color: {COLORS.PRIMARY_NAVY} !important;
             margin: 0 !important;
-            letter-spacing: -0.5px;
-            line-height: 1.2;
-        }
+            line-height: 1.3 !important;
+        }}
 
-        .insurminds-header p {
-            color: #CBD5E1 !important;
-            font-size: 14px !important;
-            margin: 8px 0 0 0 !important;
-            font-weight: 400;
-            max-width: 800px;
-        }
+        .im-topbar-divider {{
+            border: none;
+            border-top: 1px solid {COLORS.BORDER};
+            margin: 12px 0 20px 0;
+        }}
 
-        /* ====================================================================
-           3. BARRA LATERAL CORPORATIVA (Deep Midnight Slate)
-           ==================================================================== */
-        [data-testid="stSidebar"] {
-            background: #0A192F !important;
-            border-right: 1px solid #1E293B !important;
-        }
+        .im-profile-tagline {{
+            font-size: 12px;
+            color: {COLORS.TEXT_MUTED};
+            font-weight: 500;
+        }}
 
-        [data-testid="stSidebar"] * {
-            color: #F1F5F9 !important;
-        }
-
-        [data-testid="stSidebar"] hr {
-            border-color: #1E293B !important;
-        }
-
-        [data-testid="stSidebar"] .stRadio label {
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(255, 255, 255, 0.06);
-            padding: 8px 14px;
-            border-radius: 8px;
-            margin-bottom: 6px;
-            transition: all 0.2s ease;
-            cursor: pointer;
-        }
-
-        [data-testid="stSidebar"] .stRadio label:hover {
-            background: rgba(2, 132, 199, 0.15) !important;
-            border-color: rgba(2, 132, 199, 0.4) !important;
-        }
+        /* Breadcrumb Corporativo */
+        .im-breadcrumb {{
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12.5px;
+            color: {COLORS.TEXT_MUTED};
+            margin-top: 4px;
+        }}
+        .im-breadcrumb-item {{
+            color: {COLORS.TEXT_MUTED};
+        }}
+        .im-breadcrumb-sep {{
+            color: #94A3B8;
+        }}
+        .im-breadcrumb-current {{
+            color: {COLORS.PRIMARY_BLUE};
+            font-weight: 600;
+        }}
 
         /* ====================================================================
-           4. CARTÕES DE MÉTRICAS & KPIS EXECUTIVOS
+           3. BARRA LATERAL (SIDEBAR) CORPORATIVA COMPACTA
            ==================================================================== */
-        div[data-testid="stMetric"] {
-            background: #FFFFFF !important;
-            border: 1px solid #E2E8F0 !important;
-            border-radius: 12px !important;
-            padding: 16px 20px !important;
-            box-shadow: 0 4px 14px rgba(15, 23, 42, 0.04) !important;
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-        }
+        [data-testid="stSidebar"] {{
+            background-color: {COLORS.SURFACE} !important;
+            background: {COLORS.SURFACE} !important;
+            border-right: 1px solid {COLORS.BORDER} !important;
+        }}
 
-        div[data-testid="stMetric"]:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08) !important;
-            border-color: #CBD5E1 !important;
-        }
+        [data-testid="stSidebar"] * {{
+            color: {COLORS.TEXT_MAIN} !important;
+        }}
 
-        div[data-testid="stMetricLabel"] {
-            font-size: 13px !important;
+        .im-sidebar-header {{
+            text-align: center;
+            padding: 12px 0 16px 0;
+            border-bottom: 1px solid {COLORS.BORDER};
+            margin-bottom: 16px;
+        }}
+
+        .im-logo-icon {{
+            font-size: 32px;
+            line-height: 1;
+            margin-bottom: 4px;
+        }}
+
+        .im-logo-title {{
+            font-size: 18px;
+            font-weight: 800;
+            color: {COLORS.PRIMARY_NAVY} !important;
+            letter-spacing: -0.3px;
+        }}
+
+        .im-logo-sub {{
+            font-size: 11px;
+            color: {COLORS.PRIMARY_BLUE} !important;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+        }}
+
+        .im-nav-section-label {{
+            font-size: 11px;
+            font-weight: 700;
+            color: {COLORS.TEXT_MUTED} !important;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            margin: 12px 0 6px 0;
+        }}
+
+        /* Botões de Seleção Lateral Estilizados */
+        [data-testid="stSidebar"] .stRadio label {{
+            background: {COLORS.SURFACE} !important;
+            border: 1px solid transparent !important;
+            padding: 8px 12px !important;
+            border-radius: {RADIUS.MD} !important;
+            margin-bottom: 4px !important;
+            transition: all 0.15s ease !important;
+            cursor: pointer !important;
+            display: flex !important;
+            align-items: center !important;
+            font-size: 13.5px !important;
+            font-weight: 500 !important;
+            color: {COLORS.TEXT_MAIN} !important;
+        }}
+
+        [data-testid="stSidebar"] .stRadio label:hover {{
+            background: {COLORS.SURFACE_HOVER} !important;
+            border-color: {COLORS.BORDER} !important;
+            color: {COLORS.PRIMARY_NAVY} !important;
+        }}
+
+        .im-sidebar-divider {{
+            border: none;
+            border-top: 1px solid {COLORS.BORDER};
+            margin: 16px 0;
+        }}
+
+        .im-system-status {{
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 12px;
+            border-radius: {RADIUS.MD};
+            margin-bottom: 10px;
+            font-size: 12px;
+        }}
+
+        .im-status-online {{
+            background-color: #E6F4EA;
+            border: 1px solid #A3D9B5;
+            color: {COLORS.SUCCESS};
+        }}
+
+        .im-status-fallback {{
+            background-color: #EFF6FF;
+            border: 1px solid #BFDBFE;
+            color: {COLORS.PRIMARY_BLUE};
+        }}
+
+        .im-status-dot-green {{
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: {COLORS.SUCCESS};
+            display: inline-block;
+        }}
+
+        .im-status-dot-blue {{
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: {COLORS.PRIMARY_BLUE};
+            display: inline-block;
+        }}
+
+        .im-status-name {{
+            font-weight: 600;
+            font-size: 12px;
+        }}
+
+        .im-status-model {{
+            font-family: {TYPOGRAPHY.FONT_CODE};
+            font-size: 11px;
+            color: {COLORS.TEXT_MUTED};
+        }}
+
+        .im-sidebar-meta {{
+            font-size: 11.5px;
+            color: {COLORS.TEXT_MUTED};
+            line-height: 1.6;
+        }}
+
+        /* ====================================================================
+           4. CARTÕES INSTITUCIONAIS & METRICCARDS
+           ==================================================================== */
+        .im-card {{
+            background-color: {COLORS.SURFACE};
+            border: 1px solid {COLORS.BORDER};
+            border-radius: {RADIUS.LG};
+            padding: 20px 24px;
+            margin-bottom: 16px;
+            box-shadow: {SHADOWS.SM};
+            transition: border-color 0.15s ease;
+        }}
+
+        .im-card:hover {{
+            border-color: #B0C0D0;
+        }}
+
+        .im-card-header {{
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 14px;
+        }}
+
+        .im-card-title {{
+            font-size: 16px !important;
             font-weight: 600 !important;
-            color: #64748B !important;
+            color: {COLORS.PRIMARY_NAVY} !important;
+            margin: 0 !important;
+        }}
+
+        .im-card-subtitle {{
+            font-size: 13px !important;
+            color: {COLORS.TEXT_MUTED} !important;
+            margin: 2px 0 0 0 !important;
+        }}
+
+        /* MetricCards */
+        .im-metric-card {{
+            background-color: {COLORS.SURFACE};
+            border: 1px solid {COLORS.BORDER};
+            border-radius: {RADIUS.MD};
+            padding: 14px 18px;
+            box-shadow: {SHADOWS.SM};
+        }}
+
+        .im-metric-label {{
+            font-size: 12px;
+            font-weight: 600;
+            color: {COLORS.TEXT_MUTED};
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+        }}
+
+        .im-metric-value {{
+            font-size: 24px;
+            font-weight: 700;
+            color: {COLORS.PRIMARY_NAVY};
+            line-height: 1.2;
+        }}
+
+        .im-metric-delta {{
+            font-size: 12px;
+            font-weight: 600;
+            margin-top: 4px;
+        }}
+
+        /* Streamlit native metric overrides */
+        div[data-testid="stMetric"] {{
+            background-color: {COLORS.SURFACE} !important;
+            border: 1px solid {COLORS.BORDER} !important;
+            border-radius: {RADIUS.MD} !important;
+            padding: 14px 18px !important;
+            box-shadow: {SHADOWS.SM} !important;
+        }}
+
+        div[data-testid="stMetricLabel"] {{
+            font-size: 12px !important;
+            font-weight: 600 !important;
+            color: {COLORS.TEXT_MUTED} !important;
             text-transform: uppercase !important;
             letter-spacing: 0.5px !important;
-        }
+        }}
 
-        div[data-testid="stMetricValue"] {
-            font-size: 28px !important;
-            font-weight: 800 !important;
-            color: #0A192F !important;
-        }
+        div[data-testid="stMetricValue"] {{
+            font-size: 24px !important;
+            font-weight: 700 !important;
+            color: {COLORS.PRIMARY_NAVY} !important;
+        }}
 
         /* ====================================================================
-           5. BOTÕES & INTERATIVIDADE
+           5. BADGES SEMÂNTICOS & STATUS BADGES
            ==================================================================== */
-        /* Botão Primário (Azul Institucional / Royal Azure) */
-        button[kind="primary"], .stButton > button[kind="primary"] {
-            background: linear-gradient(135deg, #0284C7 0%, #0369A1 100%) !important;
+        .im-badge {{
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 12px;
+            font-weight: 600;
+            padding: 3px 10px;
+            border-radius: {RADIUS.PILL};
+            border: 1px solid transparent;
+            line-height: 1.3;
+        }}
+
+        .badge-icon {{
+            font-size: 11px;
+            font-weight: 700;
+        }}
+
+        .im-status-badge {{
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 11.5px;
+            font-weight: 600;
+            padding: 2px 8px;
+            border-radius: {RADIUS.SM};
+            border: 1px solid transparent;
+        }}
+
+        /* Classes semânticas oficiais */
+        .badge-sem-equiv {{
+            background-color: #E6F4EA !important;
+            color: #197B5C !important;
+            border-color: #A3D9B5 !important;
+        }}
+
+        .badge-sem-diff {{
+            background-color: #FDE8E8 !important;
+            color: #D94A4A !important;
+            border-color: #F8B4B4 !important;
+        }}
+
+        .badge-sem-broader {{
+            background-color: #E0F2F1 !important;
+            color: #0B8A84 !important;
+            border-color: #80CBC4 !important;
+        }}
+
+        .badge-sem-narrower {{
+            background-color: #EFF6FF !important;
+            color: #2864C7 !important;
+            border-color: #BFDBFE !important;
+        }}
+
+        .badge-sem-scope {{
+            background-color: #FEF3C7 !important;
+            color: #B45309 !important;
+            border-color: #FCD34D !important;
+        }}
+
+        .badge-sem-cond {{
+            background-color: #F3E8FF !important;
+            color: #7E22CE !important;
+            border-color: #D8B4FE !important;
+        }}
+
+        .badge-sem-limit {{
+            background-color: #E0E7FF !important;
+            color: #3730A3 !important;
+            border-color: #C7D2FE !important;
+        }}
+
+        /* ====================================================================
+           6. DIFFERENCE CARD & EVIDÊNCIAS AUDITÁVEIS
+           ==================================================================== */
+        .im-difference-card {{
+            background-color: {COLORS.SURFACE};
+            border: 1px solid {COLORS.BORDER};
+            border-radius: {RADIUS.MD};
+            padding: 16px 20px;
+            margin-bottom: 12px;
+            box-shadow: {SHADOWS.SM};
+        }}
+
+        .im-diff-header {{
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }}
+
+        .im-diff-confidence {{
+            font-size: 11.5px;
+            color: {COLORS.TEXT_MUTED};
+            font-weight: 500;
+        }}
+
+        .im-diff-title {{
+            font-size: 15px;
+            font-weight: 600;
+            color: {COLORS.PRIMARY_NAVY};
+            margin-bottom: 6px;
+        }}
+
+        .im-diff-pages {{
+            font-size: 12.5px;
+            color: {COLORS.TEXT_MUTED};
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }}
+
+        .im-page-tag {{
+            background-color: {COLORS.BACKGROUND};
+            padding: 2px 6px;
+            border-radius: {RADIUS.SM};
+            border: 1px solid {COLORS.BORDER};
+            font-family: {TYPOGRAPHY.FONT_CODE};
+            font-size: 11.5px;
+        }}
+
+        .im-diff-explanation {{
+            font-size: 13.5px;
+            color: {COLORS.TEXT_MAIN};
+            line-height: 1.5;
+            background-color: {COLORS.SURFACE_MUTED};
+            padding: 10px 14px;
+            border-radius: {RADIUS.SM};
+            border-left: 3px solid {COLORS.PRIMARY_BLUE};
+        }}
+
+        /* Painel e Snippet de Evidência */
+        .im-evidence-panel {{
+            background-color: {COLORS.SURFACE};
+            border: 1px solid {COLORS.BORDER};
+            border-radius: {RADIUS.MD};
+            padding: 16px;
+            margin-top: 10px;
+            box-shadow: {SHADOWS.SM};
+        }}
+
+        .im-evidence-panel-title {{
+            font-size: 13px;
+            font-weight: 600;
+            color: {COLORS.PRIMARY_NAVY};
+            margin-bottom: 12px;
+        }}
+
+        .im-evidence-grid {{
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }}
+
+        .im-evidence-snippet {{
+            background-color: {COLORS.SURFACE_MUTED};
+            border: 1px solid {COLORS.BORDER};
+            border-radius: {RADIUS.SM};
+            padding: 12px 14px;
+        }}
+
+        .im-evidence-header {{
+            display: flex;
+            justify-content: space-between;
+            font-size: 11.5px;
+            color: {COLORS.TEXT_MUTED};
+            margin-bottom: 8px;
+            border-bottom: 1px solid {COLORS.BORDER};
+            padding-bottom: 4px;
+        }}
+
+        .evidence-page {{
+            color: {COLORS.PRIMARY_BLUE};
+            font-weight: 600;
+        }}
+
+        .evidence-method {{
+            font-family: {TYPOGRAPHY.FONT_CODE};
+            font-size: 10.5px;
+            background-color: #E2E8F0;
+            padding: 1px 4px;
+            border-radius: 2px;
+        }}
+
+        .im-evidence-content {{
+            font-family: {TYPOGRAPHY.FONT_CODE};
+            font-size: 12px;
+            line-height: 1.6;
+            color: {COLORS.TEXT_MAIN};
+            white-space: pre-wrap;
+            word-break: break-word;
+        }}
+
+        /* ====================================================================
+           7. ESTADOS DO SISTEMA (Empty, Loading, Error, etc.)
+           ==================================================================== */
+        .im-state-box {{
+            background-color: {COLORS.SURFACE};
+            border: 1px solid {COLORS.BORDER};
+            border-radius: {RADIUS.LG};
+            padding: 32px 24px;
+            text-align: center;
+            margin: 16px 0;
+            box-shadow: {SHADOWS.SM};
+        }}
+
+        .im-state-icon {{
+            font-size: 32px;
+            margin-bottom: 10px;
+        }}
+
+        .im-state-title {{
+            font-size: 16px !important;
+            font-weight: 600 !important;
+            color: {COLORS.PRIMARY_NAVY} !important;
+            margin: 0 0 6px 0 !important;
+        }}
+
+        .im-state-desc {{
+            font-size: 13.5px !important;
+            color: {COLORS.TEXT_MUTED} !important;
+            max-width: 520px;
+            margin: 0 auto !important;
+            line-height: 1.5;
+        }}
+
+        /* Spinner corporativo discreto */
+        .im-spinner {{
+            width: 28px;
+            height: 28px;
+            border: 3px solid {COLORS.BORDER};
+            border-top: 3px solid {COLORS.PRIMARY_BLUE};
+            border-radius: 50%;
+            animation: im-spin 0.8s linear infinite;
+            margin: 0 auto 12px auto;
+        }}
+
+        @keyframes im-spin {{
+            0% {{ transform: rotate(0deg); }}
+            100% {{ transform: rotate(360deg); }}
+        }}
+
+        /* Alertas Corporativos */
+        .im-alert {{
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 12px 16px;
+            border-radius: {RADIUS.MD};
+            font-size: 13px;
+            line-height: 1.5;
+            margin-bottom: 14px;
+            border: 1px solid transparent;
+        }}
+
+        .im-alert-icon {{
+            font-size: 16px;
+            line-height: 1;
+            margin-top: 2px;
+        }}
+
+        .im-alert-info {{
+            background-color: #EFF6FF;
+            border-color: #BFDBFE;
+            color: #1E40AF;
+        }}
+
+        .im-alert-success {{
+            background-color: #E6F4EA;
+            border-color: #A3D9B5;
+            color: #166534;
+        }}
+
+        .im-alert-attention {{
+            background-color: #FEF3C7;
+            border-color: #FCD34D;
+            color: #92400E;
+        }}
+
+        .im-alert-critical {{
+            background-color: #FDE8E8;
+            border-color: #F8B4B4;
+            color: #991B1B;
+        }}
+
+        .im-alert-legal {{
+            background-color: #F8FAFC;
+            border-color: {COLORS.BORDER};
+            border-left: 4px solid {COLORS.PRIMARY_NAVY};
+            color: {COLORS.PRIMARY_NAVY};
+        }}
+
+        /* ====================================================================
+           8. BOTÕES & CONTROLES STREAMLIT PADRÃO CORPORATIVO
+           ==================================================================== */
+        /* Botão Primário */
+        button[kind="primary"], .stButton > button[kind="primary"] {{
+            background-color: {COLORS.PRIMARY_BLUE} !important;
             color: #FFFFFF !important;
-            border: none !important;
-            padding: 10px 22px !important;
+            border: 1px solid {COLORS.PRIMARY_BLUE} !important;
+            padding: 8px 18px !important;
             font-weight: 600 !important;
-            font-size: 14px !important;
-            border-radius: 8px !important;
-            box-shadow: 0 4px 12px rgba(2, 132, 199, 0.25) !important;
-            transition: all 0.2s ease-in-out !important;
-        }
+            font-size: 13.5px !important;
+            border-radius: {RADIUS.MD} !important;
+            box-shadow: {SHADOWS.SM} !important;
+            transition: all 0.15s ease !important;
+        }}
 
-        button[kind="primary"]:hover, .stButton > button[kind="primary"]:hover {
-            background: linear-gradient(135deg, #0369A1 0%, #075985 100%) !important;
-            box-shadow: 0 6px 18px rgba(2, 132, 199, 0.35) !important;
-            transform: translateY(-1px);
-        }
+        button[kind="primary"]:hover, .stButton > button[kind="primary"]:hover {{
+            background-color: #1F4FA0 !important;
+            border-color: #1F4FA0 !important;
+            color: #FFFFFF !important;
+        }}
 
-        /* Botão Secundário / Padrão */
-        .stButton > button:not([kind="primary"]) {
-            background-color: #FFFFFF !important;
-            color: #0F172A !important;
-            border: 1px solid #CBD5E1 !important;
-            padding: 9px 18px !important;
-            font-weight: 600 !important;
-            border-radius: 8px !important;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05) !important;
-            transition: all 0.15s ease-in-out !important;
-        }
+        /* Botão Secundário */
+        .stButton > button:not([kind="primary"]) {{
+            background-color: {COLORS.SURFACE} !important;
+            color: {COLORS.TEXT_MAIN} !important;
+            border: 1px solid {COLORS.BORDER} !important;
+            padding: 8px 16px !important;
+            font-weight: 500 !important;
+            font-size: 13.5px !important;
+            border-radius: {RADIUS.MD} !important;
+            box-shadow: {SHADOWS.SM} !important;
+            transition: all 0.15s ease !important;
+        }}
 
-        .stButton > button:not([kind="primary"]):hover {
-            border-color: #0284C7 !important;
-            color: #0284C7 !important;
-            background-color: #F8FAFC !important;
-            transform: translateY(-1px);
-        }
+        .stButton > button:not([kind="primary"]):hover {{
+            background-color: {COLORS.SURFACE_HOVER} !important;
+            border-color: #B0C0D0 !important;
+            color: {COLORS.PRIMARY_NAVY} !important;
+        }}
 
         /* Botão de Download */
-        .stDownloadButton > button {
-            background-color: #FFFFFF !important;
-            color: #0F253E !important;
-            border: 1.5px solid #0F253E !important;
-            border-radius: 8px !important;
+        .stDownloadButton > button {{
+            background-color: {COLORS.SURFACE} !important;
+            color: {COLORS.PRIMARY_BLUE} !important;
+            border: 1px solid {COLORS.BORDER} !important;
+            border-radius: {RADIUS.MD} !important;
             font-weight: 600 !important;
-            transition: all 0.2s ease !important;
-        }
+            font-size: 13px !important;
+        }}
 
-        .stDownloadButton > button:hover {
-            background-color: #0F253E !important;
-            color: #FFFFFF !important;
-        }
+        .stDownloadButton > button:hover {{
+            background-color: #EFF6FF !important;
+            border-color: {COLORS.PRIMARY_BLUE} !important;
+            color: {COLORS.PRIMARY_BLUE} !important;
+        }}
+
+        /* Inputs e Selects */
+        div[data-baseweb="select"] > div {{
+            background-color: {COLORS.SURFACE} !important;
+            border: 1px solid {COLORS.BORDER} !important;
+            border-radius: {RADIUS.MD} !important;
+            color: {COLORS.TEXT_MAIN} !important;
+        }}
+
+        input {{
+            color: {COLORS.TEXT_MAIN} !important;
+            background-color: {COLORS.SURFACE} !important;
+        }}
+
+        /* Abas Streamlit Corporativas */
+        .stTabs [data-baseweb="tab-list"] {{
+            gap: 4px !important;
+            background-color: transparent !important;
+            border-bottom: 2px solid {COLORS.BORDER} !important;
+            padding: 0 !important;
+        }}
+
+        .stTabs [data-baseweb="tab"] {{
+            background-color: transparent !important;
+            border: none !important;
+            color: {COLORS.TEXT_MUTED} !important;
+            font-weight: 600 !important;
+            font-size: 13.5px !important;
+            padding: 10px 16px !important;
+            border-bottom: 2px solid transparent !important;
+            margin-bottom: -2px !important;
+            transition: all 0.15s ease !important;
+        }}
+
+        .stTabs [data-baseweb="tab"]:hover {{
+            color: {COLORS.PRIMARY_NAVY} !important;
+            background-color: {COLORS.SURFACE_HOVER} !important;
+        }}
+
+        .stTabs [aria-selected="true"] {{
+            color: {COLORS.PRIMARY_BLUE} !important;
+            border-bottom: 2px solid {COLORS.PRIMARY_BLUE} !important;
+            background-color: transparent !important;
+        }}
+
+        .stTabs [data-baseweb="tab-highlight"] {{
+            display: none !important;
+        }}
+
+        /* Expanders */
+        div[data-testid="stExpander"] {{
+            background-color: {COLORS.SURFACE} !important;
+            border: 1px solid {COLORS.BORDER} !important;
+            border-radius: {RADIUS.MD} !important;
+            box-shadow: {SHADOWS.SM} !important;
+            margin-bottom: 10px !important;
+        }}
+
+        summary[data-testid="stExpanderToggle"] {{
+            color: {COLORS.PRIMARY_NAVY} !important;
+            font-weight: 600 !important;
+            font-size: 13.5px !important;
+        }}
+
+        summary[data-testid="stExpanderToggle"]:hover {{
+            color: {COLORS.PRIMARY_BLUE} !important;
+        }}
+
+        /* Tabelas e Dataframes */
+        [data-testid="stDataFrame"] {{
+            border: 1px solid {COLORS.BORDER} !important;
+            border-radius: {RADIUS.MD} !important;
+            background-color: {COLORS.SURFACE} !important;
+        }}
+
+        /* Barra de Progresso */
+        div[data-testid="stProgressBar"] > div > div {{
+            background: linear-gradient(90deg, {COLORS.PRIMARY_BLUE} 0%, {COLORS.SECONDARY_TEAL} 100%) !important;
+            border-radius: {RADIUS.PILL} !important;
+        }}
 
         /* ====================================================================
-           6. CAIXAS DE COBERTURA, EXCLUSÃO E RISCO (Harmonização Semântica)
+           9. CLASSES DE RETROCOMPATIBILIDADE PARA TELAS EXISTENTES
            ==================================================================== */
-        /* Cobertura Exclusiva / Vantajosa (Emerald / Teal) */
-        .coverage-box {
-            background: #F0FDF4;
-            border: 1px solid #BBF7D0;
-            border-left: 4px solid #10B981;
-            padding: 12px 16px;
-            margin-bottom: 10px;
-            border-radius: 8px;
-            font-size: 13.5px;
-            color: #065F46;
-            line-height: 1.4;
-            box-shadow: 0 1px 3px rgba(16, 185, 129, 0.05);
-        }
+        .disclaimer-banner {{
+            background-color: #F8FAFC;
+            border: 1px solid {COLORS.BORDER};
+            border-left: 4px solid {COLORS.PRIMARY_NAVY};
+            padding: 12px 18px;
+            border-radius: {RADIUS.MD};
+            margin: 12px 0 20px 0;
+            font-size: 13px;
+            color: {COLORS.PRIMARY_NAVY};
+        }}
 
-        /* Cobertura Neutra / Em Comum */
-        .common-box {
-            background: #F8FAFC;
-            border: 1px solid #E2E8F0;
-            border-left: 4px solid #64748B;
+        .doc-summary-card {{
+            background-color: {COLORS.SURFACE};
+            border: 1px solid {COLORS.BORDER};
+            border-top: 3px solid {COLORS.PRIMARY_BLUE};
+            border-radius: {RADIUS.MD};
+            padding: 18px 22px;
+            margin-bottom: 16px;
+            box-shadow: {SHADOWS.SM};
+        }}
+
+        .substantive-card {{
+            background-color: {COLORS.SURFACE};
+            border: 1px solid {COLORS.BORDER};
+            border-left: 4px solid {COLORS.CRITICAL};
+            border-radius: {RADIUS.MD};
+            padding: 16px 20px;
+            margin-bottom: 14px;
+            box-shadow: {SHADOWS.SM};
+        }}
+
+        .evidence-box {{
+            background-color: {COLORS.SURFACE_MUTED};
+            border: 1px solid {COLORS.BORDER};
+            border-left: 3px solid {COLORS.PRIMARY_BLUE};
+            border-radius: {RADIUS.SM};
+            padding: 12px 16px;
+            font-size: 12px;
+            color: {COLORS.TEXT_MAIN};
+            margin-top: 8px;
+            font-family: {TYPOGRAPHY.FONT_CODE};
+            line-height: 1.6;
+        }}
+
+        .coverage-box {{
+            background-color: #E6F4EA;
+            border: 1px solid #A3D9B5;
+            border-left: 3px solid {COLORS.SUCCESS};
             padding: 10px 14px;
             margin-bottom: 8px;
-            border-radius: 8px;
+            border-radius: {RADIUS.SM};
             font-size: 13px;
-            color: #334155;
-        }
+            color: #166534;
+        }}
 
-        /* Exclusão / Risco Crítico (Crimson / Ruby) */
-        .exclusion-box {
-            background: #FEF2F2;
-            border: 1px solid #FECACA;
-            border-left: 4px solid #EF4444;
-            padding: 12px 16px;
-            margin-bottom: 10px;
-            border-radius: 8px;
-            font-size: 13.5px;
+        .exclusion-box {{
+            background-color: #FDE8E8;
+            border: 1px solid #F8B4B4;
+            border-left: 3px solid {COLORS.CRITICAL};
+            padding: 10px 14px;
+            margin-bottom: 8px;
+            border-radius: {RADIUS.SM};
+            font-size: 13px;
             color: #991B1B;
+        }}
+
+        .badge-tag {{
+            display: inline-block;
+            background-color: #E2E8F0;
+            color: {COLORS.PRIMARY_NAVY};
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            padding: 2px 8px;
+            border-radius: {RADIUS.SM};
+            margin-bottom: 6px;
+        }}
+
+        /* ====================================================================
+           10. ASSISTENTE CONTEXTUAL — COPILOTO DE LEITURA (FASE 7.9)
+           ==================================================================== */
+        .im-assistant-panel {{
+            background-color: {COLORS.SURFACE};
+            border: 1px solid #CBD5E1;
+            border-top: 4px solid {COLORS.PRIMARY_BLUE};
+            border-radius: {RADIUS.MD};
+            padding: 18px 22px;
+            margin-bottom: 20px;
+            box-shadow: {SHADOWS.MD};
+        }}
+
+        .im-assistant-header {{
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }}
+
+        .im-assistant-context-bar {{
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            align-items: center;
+            background: #F8FAFC;
+            border: 1px solid #E2E8F0;
+            padding: 8px 14px;
+            border-radius: {RADIUS.SM};
+            margin: 10px 0 16px 0;
+            font-size: 12px;
+            color: {COLORS.TEXT_MAIN};
+        }}
+
+        .im-assistant-box {{
+            background-color: {COLORS.SURFACE};
+            border: 1px solid #D9E1E8;
+            border-radius: {RADIUS.SM};
+            padding: 16px 18px;
+            margin-top: 14px;
+            font-size: 13px;
+            line-height: 1.6;
+            color: {COLORS.TEXT_MAIN};
+        }}
+
+        .im-assistant-gov-box {{
+            background-color: #F8FAFC;
+            border: 1px solid #E2E8F0;
+            border-radius: {RADIUS.SM};
+            padding: 8px 12px;
+            font-size: 11px;
+            color: #475569;
+            margin-top: 14px;
             line-height: 1.4;
-            box-shadow: 0 1px 3px rgba(239, 68, 68, 0.05);
-        }
-
-        /* Alerta de Divergência Financeira (Amber Gold) */
-        .divergence-box {
-            background: #FFFBEB;
-            border: 1px solid #FDE68A;
-            border-left: 4px solid #F59E0B;
-            padding: 12px 16px;
-            margin-bottom: 10px;
-            border-radius: 8px;
-            font-size: 13.5px;
-            color: #92400E;
-        }
-
-        /* ====================================================================
-           7. BADGES DE CONFORMIDADE & STATUS
-           ==================================================================== */
-        .badge-equal {
-            background: #ECFDF5;
-            color: #065F46;
-            border: 1px solid #A7F3D0;
-            padding: 3px 10px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 700;
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-        }
-
-        .badge-diff {
-            background: #FFFBEB;
-            color: #B45309;
-            border: 1px solid #FDE68A;
-            padding: 3px 10px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 700;
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-        }
-
-        .badge-missing {
-            background: #FEF2F2;
-            color: #B91C1C;
-            border: 1px solid #FECACA;
-            padding: 3px 10px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 700;
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-        }
-
-        /* ====================================================================
-           8. TABELAS & DATAFRAMES
-           ==================================================================== */
-        div[data-testid="stDataFrame"] {
-            border: 1px solid #E2E8F0 !important;
-            border-radius: 10px !important;
-            overflow: hidden !important;
-            box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04) !important;
-        }
-
-        /* Expanders elegantes */
-        .streamlit-expanderHeader {
-            background-color: #FFFFFF !important;
-            border: 1px solid #E2E8F0 !important;
-            border-radius: 8px !important;
-            font-weight: 600 !important;
-            color: #0F253E !important;
-            font-size: 14.5px !important;
-        }
-
-        /* Barra de Progresso elegante */
-        div[data-testid="stProgressBar"] > div > div {
-            background: linear-gradient(90deg, #0284C7 0%, #10B981 100%) !important;
-            border-radius: 10px !important;
-        }
+        }}
         </style>
-    """, unsafe_allow_html=True)
+    """)

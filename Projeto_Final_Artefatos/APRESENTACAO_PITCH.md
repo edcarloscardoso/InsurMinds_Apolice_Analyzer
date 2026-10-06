@@ -1,45 +1,82 @@
 # Roteiro de Demonstração & Pitch Deck (5 Minutos)
-**InsurMinds Apólice Analyzer · Apresentação Final da Banca I2A2**
+**InsurMinds Apólice Analyzer · Apresentação Final da Banca I2A2**<br>
+*Instituto de Inteligência Artificial Aplicada — I2A2 (2026)*
 
 ---
 
-## 🎯 1. O Problema (Minuto 0:00 – 1:00)
-- **Cenário:** O seguro D&O (Directors & Officers) protege o patrimônio pessoal de conselheiros e diretores de empresas contra reclamações e investigações regulatórias.
-- **A Dor:** Apólices D&O possuem entre 30 e 80 páginas em linguagem jurídica densa. Comparar duas propostas exige de 3 a 5 horas de trabalho especializado de corretores seniores e advogados.
-- **Impacto:** Erros na análise de cláusulas como *Side A DIC*, franquias de penhora online ou retroatividade podem deixar administradores desprotegidos em sinistros multimilionários.
+| Metadado | Informação |
+|---|---|
+| **Projeto** | InsurMinds Apólice Analyzer |
+| **Curso** | Inteligência Artificial Aplicada às Finanças e Seguros (InsurMinds) |
+| **Instituição** | I2A2 — Instituto de Inteligência Artificial Aplicada |
+| **Equipe** | Seguros Connect |
+| **Integrantes** | Edcarlos Cardôso de Farias · Eric Narciso Pimentel dos Santos |
+| **Data da Entrega** | 06 de Outubro de 2026 |
+| **Duração Total** | 5 Minutos (Apresentação Oral / Gravação de Vídeo) |
+| **Status do MVP** | Homologado em Linux (182/182 testes) · Windows 11: PENDING REAL VALIDATION |
 
 ---
 
-## 💡 2. A Solução InsurMinds (Minuto 1:00 – 2:00)
-- Uma plataforma inteligente baseada em **IA Generativa (Google Gemini 2.0 Flash)** e **Orquestração Multi-Agente (LangGraph)**.
-- **Pipeline de 6 Agentes Especializados:**
-  1. *Reception Agent:* Valida integridade e garante idempotência por hashing criptográfico.
-  2. *Extractor Agent:* Extrai texto nativo com fallback OCR de visão multimodal para PDFs escaneados.
-  3. *Identifier Agent:* Segmenta as cláusulas semânticas da apólice.
-  4. *Structurer Agent:* Converte em esquemas contratuais canônicos Pydantic.
-  5. *Comparator Agent:* Confronta os dados determinísticos e calcula o Score de Similaridade de Jaccard.
-  6. *Reporter Agent:* Gera um parecer executivo narrativo com recomendações estratégicas em segundos.
+## 1. O Problema de Negócio e de Pesquisa (0:00 – 0:45 min)
+
+- **Complexidade do Domínio:** Apólices do ramo de Responsabilidade Civil de Diretores e Administradores (D&O) são documentos extensos, redigidos em linguagem jurídica e descentralizados entre condições gerais, especiais, exclusões, definições e cláusulas particulares.
+- **Insuficiência da Busca Textual Direta:** Comparações simples por palavras-chave são ineficazes, pois termos idênticos (ex.: "custos de defesa") podem conter condições divergentes, enquanto redações diferentes podem tratar de garantias equivalentes.
+- **Gargalos Operacionais:** O processo exige extração de dados em arquivos heterogêneos (PDFs digitais, escaneados e imagens), padronização em uma estrutura única de comparação e, sobretudo, exatidão na explicitação do trecho e da página que justificam cada diferença apontada.
 
 ---
 
-## 🚀 3. Demonstração Prática ao Vivo (Minuto 2:00 – 4:00)
-1. **Upload / Amostras:**
-   - Clicar em *"⚡ Carregar Apólices de Demonstração"*.
-   - Acompanhar a timeline em tempo real dos 4 agentes processando as apólices da Allianz, Chubb e AIG.
-2. **Biblioteca de Apólices:**
-   - Exibir o catálogo com os limites, prêmios e coberturas já salvos no banco SQLite.
-   - Selecionar **Allianz** e **Chubb** para o confronto.
-3. **Matriz Comparativa & Gap Analysis:**
-   - Mostrar o Scorecard de Similaridade (ex: **78.4%**).
-   - Destacar as bandeiras visuais na tabela (Diferença no LMG: R$ 10M vs R$ 5M; Franquias: R$ 50k vs R$ 100k).
-   - Apresentar as coberturas exclusivas detectadas (Allianz com *Investigação Regulatória*; Chubb com *Side A DIC*).
-4. **Parecer Executivo:**
-   - Exibir o parecer gerado pela IA estruturado com Resumo Executivo, Análise de Riscos e Recomendação Final.
-   - Demonstrar o download em Markdown e JSON consolidado.
+## 2. A Solução Proposta (0:45 – 1:30 min)
+
+- **Proposta de Valor:** O InsurMinds Apólice Analyzer é um MVP focado na análise e comparação assistida de apólices D&O.
+- **Fluxo Contínuo de Processamento:** A solução articula um pipeline estruturado em 5 etapas principais:
+  $$\text{Documento} \longrightarrow \text{Extração e OCR} \longrightarrow \text{Conhecimento Estruturado} \longrightarrow \text{Comparação Analítica} \longrightarrow \text{Diferenças e Evidências}$$
+- **Escopo Assistido:** O sistema atua estritamente como ferramenta de apoio ao analista, subscritor ou corretor, sem a pretensão de substituir a avaliação jurídica ou realizar subscrições autônomas.
 
 ---
 
-## 📈 4. Diferenciais de Engenharia de Dados & Conclusão (Minuto 4:00 – 5:00)
-- **Resiliência Zero-Crash:** Provedores de contingência garantem execução mesmo em caso de indisponibilidade de chaves de API externas.
-- **Arquitetura de Dados Segura:** Sanitização completa contra Path Traversal, validação de magic bytes e consultas parametrizadas.
-- **Próximos Passos:** Suporte a apólices de Riscos Cibernéticos (Cyber) e E&O (Erros e Omissões).
+## 3. Arquitetura do Sistema e Pipeline Multiagente (1:30 – 2:30 min)
+
+- **Arquitetura em Camadas:** Organizada em Apresentação (Streamlit), Orquestração, Agentes, Domínio (Pydantic / Regras) e Persistência (SQLite).
+- **Modelo Conceitual vs. Execução Prática:** O fluxo de estados foi formalmente modelado em grafos via LangGraph, mas executado na interface do Streamlit por meio de *runners* procedurais para garantir controle previsível do progresso visual.
+- **Pipeline Distribuído em 6 Agentes Especializados:**
+  1. **Reception Agent:** Valida o arquivo por assinatura binária (*magic bytes*), calcula hashes e garante idempotência no banco de dados.
+  2. **Extractor Agent:** Gerencia as rotas de extração (PDF digital via `pdfplumber`; PDF escaneado/imagem via OCR/Gemini Vision com fallback para `PyMuPDF` / `Tesseract`).
+  3. **Identifier Agent:** Mapeia seções estratégicas de D&O (coberturas, exclusões, limites, franquias, retroatividade, jurisdição).
+  4. **Structurer Agent:** Normaliza os dados extraídos no modelo canônico (`ApoliceDAO`) e associa as evidências documentais.
+  5. **Comparator Agent:** Confronta os dados normalizados aplicando regras de negócio e classificações semânticas.
+  6. **Reporter Agent:** Sintetiza os achados em pareceres explicativos e permite exportação em JSON e Markdown.
+
+---
+
+## 4. Uso Estratégico de Inteligência Artificial (2:30 – 3:15 min)
+
+- **Structured Output e Pydantic:** Uso de modelos de linguagem (Google Gemini 2.0 Flash Lite) vinculados a schemas rígidos do Pydantic, assegurando respostas tipadas e prontas para persistência no banco SQLite.
+- **Arquitetura Resiliente (Dual Mode):**
+  - **Modo Online:** Utiliza a API do Gemini para interpretação multimodal e apoio na redação do parecer.
+  - **Modo Offline / Contingência:** Garante o funcionamento contínuo através de regras determinísticas e heurísticas locais (`PyMuPDF`, `Tesseract`, `pdfplumber`), impedindo que a ausência de chave ou conexão interrompa o sistema.
+- **Diretriz de Governança:** A IA atua como intérprete e organizadora, mantendo o documento original como única fonte primária da verdade.
+
+---
+
+## 5. Diferencial Técnico e Rastreabilidade (3:15 – 3:45 min)
+
+- **Rastreabilidade por `EvidenceItem`:** Cada dado extraído ou divergência identificada vincula-se obrigatoriamente a uma estrutura contendo a página, trecho literal (*snippet*), método de extração e grau de confiança analítica (0.0 a 1.0).
+- **Modelo Canônico `ApoliceDAO`:** Padroniza atributos heterogêneos de diferentes seguradoras em uma representação única (limites, franquias, vigência, garantias, exclusões, foro e processo SUSEP).
+- **Classificação Semântica de Diferenças:** O motor classifica as relações entre cláusulas em categorias qualitativas (*equivalente*, *diferente*, *escopo ampliado/reduzido*, *condição alterada*, *limite alterado*). Utiliza também o Índice de Jaccard como métrica auxiliar de similaridade estrutural, evitando usá-lo como parecer decisório.
+
+---
+
+## 6. Metodologia de Testes e Homologação (3:45 – 4:30 min)
+
+- **Validação Multi-Camadas:** Testes unitários, de integração, de interface e de aceitação com documentos reais.
+- **Suíte de Testes Automatizada:** Atingiu **182 testes aprovados** sem nenhuma falha ou erro em ambiente Linux (`pytest` executado em 238,65s).
+- **Validação com Corpus Real:** Avaliação realizada sobre documentos públicos de grandes seguradoras do mercado brasileiro (**AIG Brasil**, **Berkley Brasil**, **Chubb**, **EZZE** e **Sompo**), com testes de comparação nos pares homologados (*Sompo v1.2 × Sompo v1.5* e *Chubb OPD 2024 × Chubb OPD 2025*).
+- **Transparência Acadêmica de Ambiente:** A homologação no Linux foi concluída com 100% de êxito. Em Windows 11, o status foi registrado como **PENDING REAL VALIDATION** devido a um problema de encoding/parsing no script de configuração PowerShell 5.1 (`setup_windows.ps1`).
+
+---
+
+## 7. Principais Resultados e Conclusão (4:30 – 5:00 min)
+
+- **Requisitos Cumpridos:** Atendimento integral com status PASS aos 7 requisitos funcionais (RF01 a RF07), abrangendo desde o upload seguro até a interface multipágina em Streamlit.
+- **Limitações Reconhecidas:** Dependência da qualidade de imagem no OCR, escopo atualmente calibrado para o ramo D&O e ausência de testes em apólices privadas com prêmios e limites reais negociados.
+- **Conclusão para a Banca:** O projeto entrega um MVP consistente, estável e auditável para o contexto acadêmico, demonstrando como a IA Generativa pode ser integrada ao setor de seguros com rigor técnico, governança e rastreabilidade total.

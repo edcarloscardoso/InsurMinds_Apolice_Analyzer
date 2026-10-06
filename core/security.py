@@ -23,7 +23,7 @@ def sanitize_filename(filename: str) -> str:
 
 def validate_pdf_content(file_bytes: bytes, filename: str) -> Tuple[bool, str]:
     """Valida se o conteúdo atende às restrições de formato, tamanho e integridade de arquivo PDF.
-    
+
     Retorna:
         Tuple[bool, str]: (sucesso, mensagem_ou_erro)
     """
@@ -33,18 +33,70 @@ def validate_pdf_content(file_bytes: bytes, filename: str) -> Tuple[bool, str]:
     if len(file_bytes) > MAX_FILE_SIZE_BYTES:
         return False, f"Arquivo excede o tamanho máximo permitido de {MAX_FILE_SIZE_BYTES // (1024 * 1024)}MB."
 
-    # Validação de extensão
+    # Validação estrita de extensão para PDF
     ext = Path(filename).suffix.lower()
-    if ext not in ALLOWED_EXTENSIONS:
+    if ext != ".pdf":
         return False, f"Extensão '{ext}' inválida. Somente arquivos PDF são permitidos."
 
     # Validação de Magic Bytes (%PDF-)
-    # A especificação PDF exige que o cabeçalho %PDF- esteja presente nos primeiros 1024 bytes
     header_sample = file_bytes[:1024]
     if b"%PDF-" not in header_sample:
         return False, "Conteúdo binário inválido: cabeçalho PDF (%PDF-) não encontrado no arquivo."
 
     return True, "Arquivo PDF válido."
+
+
+def validate_document_content(file_bytes: bytes, filename: str) -> Tuple[bool, str, str]:
+    """Valida se o conteúdo atende às restrições de formato, tamanho e integridade de arquivo PDF ou Imagem (PNG, JPG, JPEG).
+
+    Retorna:
+        Tuple[bool, str, str]: (sucesso, mensagem_ou_erro, document_format)
+        onde document_format pode ser 'pdf', 'image' ou ''
+    """
+    if not file_bytes:
+        return False, "Arquivo vazio ou não fornecido.", ""
+
+    if len(file_bytes) > MAX_FILE_SIZE_BYTES:
+        return False, f"Arquivo excede o tamanho máximo permitido de {MAX_FILE_SIZE_BYTES // (1024 * 1024)}MB.", ""
+
+    ext = Path(filename).suffix.lower()
+    if ext not in ALLOWED_EXTENSIONS:
+        return False, f"Extensão '{ext}' inválida. Formatos permitidos: PDF, PNG, JPG, JPEG.", ""
+
+    # Validação de Arquivo PDF (%PDF-)
+    if ext == ".pdf":
+        header_sample = file_bytes[:1024]
+        if b"%PDF-" not in header_sample:
+            return False, "Conteúdo binário inválido: cabeçalho PDF (%PDF-) não encontrado no arquivo.", "pdf"
+        return True, "Arquivo PDF válido.", "pdf"
+
+    # Validação de Arquivo PNG (Magic bytes: 89 50 4E 47 0D 0A 1A 0A)
+    if ext == ".png":
+        if len(file_bytes) < 8 or file_bytes[:8] != b"\x89PNG\r\n\x1a\n":
+            return False, "Conteúdo binário inválido: cabeçalho PNG (magic bytes) incompatível com extensão .png.", "image"
+        try:
+            from PIL import Image
+            import io
+            with Image.open(io.BytesIO(file_bytes)) as img:
+                img.verify()
+        except Exception as e_corrupt:
+            return False, f"Arquivo de imagem PNG corrompido ou ilegível: {str(e_corrupt)}", "image"
+        return True, "Arquivo de imagem PNG válido.", "image"
+
+    # Validação de Arquivo JPEG/JPG (Magic bytes: FF D8 FF)
+    if ext in (".jpg", ".jpeg"):
+        if len(file_bytes) < 3 or file_bytes[:3] != b"\xff\xd8\xff":
+            return False, f"Conteúdo binário inválido: cabeçalho JPEG (magic bytes) incompatível com extensão {ext}.", "image"
+        try:
+            from PIL import Image
+            import io
+            with Image.open(io.BytesIO(file_bytes)) as img:
+                img.verify()
+        except Exception as e_corrupt:
+            return False, f"Arquivo de imagem JPEG corrompido ou ilegível: {str(e_corrupt)}", "image"
+        return True, "Arquivo de imagem JPEG válido.", "image"
+
+    return False, f"Formato '{ext}' não suportado.", ""
 
 
 def compute_file_hashes(file_bytes: bytes) -> Tuple[str, str]:

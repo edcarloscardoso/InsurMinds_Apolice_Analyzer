@@ -115,7 +115,7 @@ def create_policy_pdf(
     story.append(Paragraph("1. QUADRO DE COBERTURAS CONTRATADAS", heading_style))
     story.append(Paragraph("A presente apólice garante, até o Limite Máximo de Garantia estipulado, as seguintes coberturas:", body_style))
     story.append(Spacer(1, 4))
-    
+
     for cob in coberturas:
         story.append(Paragraph(f"• <b>{cob}</b>", body_style))
         story.append(Spacer(1, 2))

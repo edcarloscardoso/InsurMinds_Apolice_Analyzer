@@ -1,0 +1,326 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" width="1600" height="900">
+  <defs>
+    <!-- Gradients -->
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0E2640"/>
+      <stop offset="50%" stop-color="#12304A"/>
+      <stop offset="100%" stop-color="#0A1E33"/>
+    </linearGradient>
+    <linearGradient id="accentLine" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#2864C7" stop-opacity="0"/>
+      <stop offset="20%" stop-color="#2864C7"/>
+      <stop offset="80%" stop-color="#0B8A84"/>
+      <stop offset="100%" stop-color="#0B8A84" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="docGradA" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1A4272"/>
+      <stop offset="100%" stop-color="#12304A"/>
+    </linearGradient>
+    <linearGradient id="docGradB" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0F5E5A"/>
+      <stop offset="100%" stop-color="#0A4844"/>
+    </linearGradient>
+    <linearGradient id="flowArrow" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#2864C7"/>
+      <stop offset="100%" stop-color="#0B8A84"/>
+    </linearGradient>
+    <linearGradient id="nodeGlow" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#2864C7" stop-opacity="0.3"/>
+      <stop offset="100%" stop-color="#0B8A84" stop-opacity="0.1"/>
+    </linearGradient>
+    <linearGradient id="titleGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#FFFFFF"/>
+      <stop offset="100%" stop-color="#B8D4F0"/>
+    </linearGradient>
+
+    <!-- Filters -->
+    <filter id="softGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="3"/>
+    </filter>
+    <filter id="docShadow" x="-10%" y="-10%" width="130%" height="130%">
+      <feDropShadow dx="4" dy="6" stdDeviation="8" flood-color="#000000" flood-opacity="0.35"/>
+    </filter>
+    <filter id="cardShadow" x="-5%" y="-5%" width="115%" height="115%">
+      <feDropShadow dx="2" dy="3" stdDeviation="4" flood-color="#000000" flood-opacity="0.25"/>
+    </filter>
+
+    <!-- Patterns -->
+    <pattern id="gridPattern" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#1A3A5C" stroke-width="0.5" opacity="0.3"/>
+    </pattern>
+    <pattern id="dotPattern" width="24" height="24" patternUnits="userSpaceOnUse">
+      <circle cx="12" cy="12" r="0.8" fill="#2864C7" opacity="0.15"/>
+    </pattern>
+  </defs>
+
+  <!-- ========== BACKGROUND ========== -->
+  <rect width="1600" height="900" fill="url(#bgGrad)"/>
+  <rect width="1600" height="900" fill="url(#gridPattern)"/>
+  <rect width="1600" height="900" fill="url(#dotPattern)"/>
+
+  <!-- Subtle radial light sources -->
+  <ellipse cx="300" cy="500" rx="400" ry="350" fill="#2864C7" opacity="0.04"/>
+  <ellipse cx="1300" cy="500" rx="400" ry="350" fill="#0B8A84" opacity="0.04"/>
+  <ellipse cx="800" cy="450" rx="300" ry="250" fill="#FFFFFF" opacity="0.02"/>
+
+  <!-- Top accent line -->
+  <rect x="0" y="0" width="1600" height="3" fill="url(#accentLine)"/>
+
+  <!-- ========== TITLE AREA ========== -->
+  <text x="800" y="110" text-anchor="middle" font-family="'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="52" font-weight="700" fill="url(#titleGrad)" letter-spacing="1">
+    InsurMinds Apólice Analyzer
+  </text>
+  <text x="800" y="155" text-anchor="middle" font-family="'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="19" fill="#7EA8D4" letter-spacing="3" font-weight="300">
+    ANÁLISE INTELIGENTE DE APÓLICES D&amp;O
+  </text>
+
+  <!-- Decorative line below title -->
+  <line x1="580" y1="178" x2="1020" y2="178" stroke="url(#accentLine)" stroke-width="1.5" opacity="0.6"/>
+
+  <!-- ========== DOCUMENT A (LEFT) ========== -->
+  <g transform="translate(115, 240)" filter="url(#docShadow)">
+    <!-- Document body -->
+    <rect x="0" y="0" width="220" height="290" rx="6" fill="url(#docGradA)" stroke="#2864C7" stroke-width="1.5"/>
+    <!-- Folded corner -->
+    <path d="M 180 0 L 220 40 L 180 40 Z" fill="#1A5090" stroke="#2864C7" stroke-width="0.5"/>
+    <path d="M 180 0 L 220 0 L 220 40" fill="none" stroke="#2864C7" stroke-width="1.5"/>
+    <!-- Header bar -->
+    <rect x="18" y="22" width="145" height="8" rx="2" fill="#2864C7" opacity="0.7"/>
+    <!-- Text lines -->
+    <rect x="18" y="48" width="185" height="4" rx="1" fill="#4A7AB5" opacity="0.35"/>
+    <rect x="18" y="60" width="170" height="4" rx="1" fill="#4A7AB5" opacity="0.3"/>
+    <rect x="18" y="72" width="180" height="4" rx="1" fill="#4A7AB5" opacity="0.25"/>
+    <rect x="18" y="84" width="140" height="4" rx="1" fill="#4A7AB5" opacity="0.3"/>
+    <!-- Separator -->
+    <line x1="18" y1="102" x2="202" y2="102" stroke="#2864C7" stroke-width="0.5" opacity="0.4"/>
+    <!-- Clause section -->
+    <rect x="18" y="115" width="120" height="5" rx="1" fill="#2864C7" opacity="0.5"/>
+    <rect x="18" y="130" width="185" height="3.5" rx="1" fill="#4A7AB5" opacity="0.25"/>
+    <rect x="18" y="140" width="175" height="3.5" rx="1" fill="#4A7AB5" opacity="0.2"/>
+    <rect x="18" y="150" width="165" height="3.5" rx="1" fill="#4A7AB5" opacity="0.25"/>
+    <rect x="18" y="160" width="180" height="3.5" rx="1" fill="#4A7AB5" opacity="0.2"/>
+    <!-- Financial section -->
+    <line x1="18" y1="180" x2="202" y2="180" stroke="#2864C7" stroke-width="0.5" opacity="0.4"/>
+    <rect x="18" y="193" width="100" height="5" rx="1" fill="#2864C7" opacity="0.5"/>
+    <rect x="18" y="208" width="185" height="3.5" rx="1" fill="#4A7AB5" opacity="0.2"/>
+    <rect x="18" y="218" width="160" height="3.5" rx="1" fill="#4A7AB5" opacity="0.25"/>
+    <rect x="18" y="228" width="175" height="3.5" rx="1" fill="#4A7AB5" opacity="0.2"/>
+    <!-- Footer -->
+    <rect x="18" y="255" width="80" height="15" rx="3" fill="#2864C7" opacity="0.2" stroke="#2864C7" stroke-width="0.5" stroke-opacity="0.4"/>
+    <text x="58" y="266" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="8" fill="#7EA8D4" font-weight="500">APÓLICE A</text>
+  </g>
+
+  <!-- ========== DOCUMENT B (RIGHT) ========== -->
+  <g transform="translate(1265, 240)" filter="url(#docShadow)">
+    <rect x="0" y="0" width="220" height="290" rx="6" fill="url(#docGradB)" stroke="#0B8A84" stroke-width="1.5"/>
+    <path d="M 180 0 L 220 40 L 180 40 Z" fill="#0C6D68" stroke="#0B8A84" stroke-width="0.5"/>
+    <path d="M 180 0 L 220 0 L 220 40" fill="none" stroke="#0B8A84" stroke-width="1.5"/>
+    <rect x="18" y="22" width="145" height="8" rx="2" fill="#0B8A84" opacity="0.7"/>
+    <rect x="18" y="48" width="185" height="4" rx="1" fill="#3DA49E" opacity="0.35"/>
+    <rect x="18" y="60" width="165" height="4" rx="1" fill="#3DA49E" opacity="0.3"/>
+    <rect x="18" y="72" width="175" height="4" rx="1" fill="#3DA49E" opacity="0.25"/>
+    <rect x="18" y="84" width="150" height="4" rx="1" fill="#3DA49E" opacity="0.3"/>
+    <line x1="18" y1="102" x2="202" y2="102" stroke="#0B8A84" stroke-width="0.5" opacity="0.4"/>
+    <rect x="18" y="115" width="120" height="5" rx="1" fill="#0B8A84" opacity="0.5"/>
+    <rect x="18" y="130" width="185" height="3.5" rx="1" fill="#3DA49E" opacity="0.25"/>
+    <rect x="18" y="140" width="170" height="3.5" rx="1" fill="#3DA49E" opacity="0.2"/>
+    <rect x="18" y="150" width="180" height="3.5" rx="1" fill="#3DA49E" opacity="0.25"/>
+    <rect x="18" y="160" width="165" height="3.5" rx="1" fill="#3DA49E" opacity="0.2"/>
+    <line x1="18" y1="180" x2="202" y2="180" stroke="#0B8A84" stroke-width="0.5" opacity="0.4"/>
+    <rect x="18" y="193" width="100" height="5" rx="1" fill="#0B8A84" opacity="0.5"/>
+    <rect x="18" y="208" width="185" height="3.5" rx="1" fill="#3DA49E" opacity="0.2"/>
+    <rect x="18" y="218" width="170" height="3.5" rx="1" fill="#3DA49E" opacity="0.25"/>
+    <rect x="18" y="228" width="155" height="3.5" rx="1" fill="#3DA49E" opacity="0.2"/>
+    <rect x="18" y="255" width="80" height="15" rx="3" fill="#0B8A84" opacity="0.2" stroke="#0B8A84" stroke-width="0.5" stroke-opacity="0.4"/>
+    <text x="58" y="266" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="8" fill="#6BC4BE" font-weight="500">APÓLICE B</text>
+  </g>
+
+  <!-- ========== CENTRAL PIPELINE ========== -->
+
+  <!-- Pipeline background panel -->
+  <rect x="390" y="225" width="820" height="320" rx="12" fill="#0D2236" stroke="#1A3A5C" stroke-width="1" opacity="0.7"/>
+
+  <!-- === STEP 1: EXTRAÇÃO === -->
+  <g transform="translate(435, 275)">
+    <!-- Node card -->
+    <rect x="0" y="0" width="150" height="80" rx="8" fill="#0F2840" stroke="#2864C7" stroke-width="1.2"/>
+    <rect x="0" y="0" width="150" height="24" rx="8" fill="#2864C7" opacity="0.15"/>
+    <rect x="0" y="16" width="150" height="8" fill="#2864C7" opacity="0.15"/>
+    <!-- Icon: extraction lines -->
+    <line x1="20" y1="12" x2="28" y2="12" stroke="#5A9AE0" stroke-width="2" stroke-linecap="round"/>
+    <line x1="20" y1="17" x2="32" y2="17" stroke="#5A9AE0" stroke-width="1.5" stroke-linecap="round" opacity="0.6"/>
+    <text x="40" y="18" font-family="'Segoe UI', Arial, sans-serif" font-size="10" fill="#B8D4F0" font-weight="600" letter-spacing="0.5">EXTRAÇÃO</text>
+    <!-- Content -->
+    <text x="75" y="44" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="9" fill="#7EA8D4" opacity="0.9">pdfplumber</text>
+    <text x="75" y="57" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="9" fill="#7EA8D4" opacity="0.7">PyMuPDF · OCR</text>
+    <text x="75" y="70" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="9" fill="#7EA8D4" opacity="0.5">Gemini Vision</text>
+  </g>
+
+  <!-- Arrow 1→2 -->
+  <g>
+    <line x1="595" y1="315" x2="635" y2="315" stroke="#2864C7" stroke-width="1.5" opacity="0.6"/>
+    <polygon points="635,311 645,315 635,319" fill="#2864C7" opacity="0.7"/>
+    <!-- Data particles -->
+    <circle cx="610" cy="312" r="1.5" fill="#5A9AE0" opacity="0.6"/>
+    <circle cx="620" cy="318" r="1" fill="#5A9AE0" opacity="0.4"/>
+  </g>
+
+  <!-- === STEP 2: ESTRUTURAÇÃO === -->
+  <g transform="translate(650, 275)">
+    <rect x="0" y="0" width="150" height="80" rx="8" fill="#0F2840" stroke="#1B6B67" stroke-width="1.2"/>
+    <rect x="0" y="0" width="150" height="24" rx="8" fill="#0B8A84" opacity="0.15"/>
+    <rect x="0" y="16" width="150" height="8" fill="#0B8A84" opacity="0.15"/>
+    <!-- Icon: structured data brackets -->
+    <text x="18" y="18" font-family="monospace" font-size="12" fill="#4DBEB8" font-weight="700" opacity="0.8">{}</text>
+    <text x="40" y="18" font-family="'Segoe UI', Arial, sans-serif" font-size="10" fill="#A8E0DB" font-weight="600" letter-spacing="0.5">ESTRUTURAÇÃO</text>
+    <!-- Content -->
+    <text x="75" y="44" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="9" fill="#6BC4BE" opacity="0.9">Pydantic v2</text>
+    <text x="75" y="57" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="9" fill="#6BC4BE" opacity="0.7">ApoliceDAO</text>
+    <text x="75" y="70" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="9" fill="#6BC4BE" opacity="0.5">SQLite</text>
+  </g>
+
+  <!-- Arrow 2→3 -->
+  <g>
+    <line x1="810" y1="315" x2="850" y2="315" stroke="#1B6B67" stroke-width="1.5" opacity="0.6"/>
+    <polygon points="850,311 860,315 850,319" fill="#1B6B67" opacity="0.7"/>
+    <circle cx="825" cy="312" r="1.5" fill="#4DBEB8" opacity="0.6"/>
+    <circle cx="835" cy="318" r="1" fill="#4DBEB8" opacity="0.4"/>
+  </g>
+
+  <!-- === STEP 3: COMPARAÇÃO === -->
+  <g transform="translate(865, 275)">
+    <rect x="0" y="0" width="150" height="80" rx="8" fill="#0F2840" stroke="#2864C7" stroke-width="0.6" stroke-opacity="0.5"/>
+    <rect x="0" y="0" width="150" height="80" rx="8" fill="none" stroke="#0B8A84" stroke-width="0.6" stroke-opacity="0.5"/>
+    <!-- Dual-color top bar for comparison concept -->
+    <rect x="0" y="0" width="75" height="24" rx="8" fill="#2864C7" opacity="0.12"/>
+    <rect x="75" y="0" width="75" height="24" rx="8" fill="#0B8A84" opacity="0.12"/>
+    <rect x="0" y="16" width="75" height="8" fill="#2864C7" opacity="0.12"/>
+    <rect x="75" y="16" width="75" height="8" fill="#0B8A84" opacity="0.12"/>
+    <!-- Icon: comparison arrows -->
+    <text x="16" y="18" font-family="monospace" font-size="12" fill="#5A9AE0" font-weight="700" opacity="0.8">⇄</text>
+    <text x="38" y="18" font-family="'Segoe UI', Arial, sans-serif" font-size="10" fill="#C4D8EE" font-weight="600" letter-spacing="0.5">COMPARAÇÃO</text>
+    <!-- Content -->
+    <text x="75" y="44" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="9" fill="#9AB8D8" opacity="0.9">Diff Semântico</text>
+    <text x="75" y="57" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="9" fill="#9AB8D8" opacity="0.7">Jaccard Score</text>
+    <text x="75" y="70" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="9" fill="#9AB8D8" opacity="0.5">Gap Analysis</text>
+  </g>
+
+  <!-- === EVIDENCE ROW === -->
+  <!-- Evidence / Output row below pipeline -->
+  <g transform="translate(435, 395)">
+    <!-- Evidence card spanning full width -->
+    <rect x="0" y="0" width="580" height="55" rx="6" fill="#0A1E33" stroke="#197B5C" stroke-width="1" opacity="0.9"/>
+    <!-- Left accent -->
+    <rect x="0" y="0" width="4" height="55" rx="2" fill="#197B5C" opacity="0.7"/>
+
+    <!-- Evidence icon -->
+    <circle cx="25" cy="28" r="10" fill="#197B5C" opacity="0.15" stroke="#197B5C" stroke-width="0.8"/>
+    <text x="25" y="32" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="11" fill="#3AAF8A" font-weight="700">✓</text>
+
+    <!-- Evidence text -->
+    <text x="48" y="19" font-family="'Segoe UI', Arial, sans-serif" font-size="9.5" fill="#3AAF8A" font-weight="600" letter-spacing="0.8">EVIDÊNCIA RASTREÁVEL</text>
+    <text x="48" y="33" font-family="'Segoe UI', Arial, sans-serif" font-size="8.5" fill="#6BC4BE" opacity="0.7">Página-fonte · Snippet · Método · Confiança</text>
+    <text x="48" y="46" font-family="'Segoe UI', Arial, sans-serif" font-size="8.5" fill="#7EA8D4" opacity="0.5">Cada campo vinculado diretamente ao documento original</text>
+
+    <!-- Right side: output format badges -->
+    <rect x="420" y="12" width="65" height="18" rx="4" fill="#197B5C" opacity="0.15" stroke="#197B5C" stroke-width="0.5"/>
+    <text x="452" y="25" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="8" fill="#3AAF8A" font-weight="500">PARECER</text>
+    <rect x="496" y="12" width="65" height="18" rx="4" fill="#2864C7" opacity="0.15" stroke="#2864C7" stroke-width="0.5"/>
+    <text x="528" y="25" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="8" fill="#5A9AE0" font-weight="500">JSON</text>
+  </g>
+
+  <!-- ========== CONNECTION LINES: Documents to Pipeline ========== -->
+  <!-- Left document → Pipeline -->
+  <g>
+    <path d="M 335 385 C 370 385, 390 315, 435 315" fill="none" stroke="#2864C7" stroke-width="1.5" stroke-dasharray="6,3" opacity="0.5"/>
+    <circle cx="345" cy="383" r="2.5" fill="#2864C7" opacity="0.5"/>
+    <circle cx="370" cy="365" r="2" fill="#2864C7" opacity="0.4"/>
+    <circle cx="395" cy="340" r="1.5" fill="#2864C7" opacity="0.3"/>
+  </g>
+
+  <!-- Right document → Pipeline -->
+  <g>
+    <path d="M 1265 385 C 1230 385, 1060 315, 1015 315" fill="none" stroke="#0B8A84" stroke-width="1.5" stroke-dasharray="6,3" opacity="0.5"/>
+    <circle cx="1255" cy="383" r="2.5" fill="#0B8A84" opacity="0.5"/>
+    <circle cx="1230" cy="365" r="2" fill="#0B8A84" opacity="0.4"/>
+    <circle cx="1200" cy="340" r="1.5" fill="#0B8A84" opacity="0.3"/>
+  </g>
+
+  <!-- ========== BOTTOM TECHNOLOGY STRIP ========== -->
+  <g transform="translate(0, 620)">
+    <!-- Separator -->
+    <line x1="200" y1="0" x2="1400" y2="0" stroke="#1A3A5C" stroke-width="0.5" opacity="0.5"/>
+
+    <!-- Tech badges row -->
+    <g transform="translate(240, 25)">
+      <!-- LangGraph -->
+      <rect x="0" y="0" width="110" height="28" rx="5" fill="#12304A" stroke="#2864C7" stroke-width="0.8" opacity="0.8"/>
+      <text x="55" y="18" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="9.5" fill="#5A9AE0" font-weight="500">LangGraph</text>
+    </g>
+    <g transform="translate(370, 25)">
+      <!-- Gemini -->
+      <rect x="0" y="0" width="110" height="28" rx="5" fill="#12304A" stroke="#2864C7" stroke-width="0.8" opacity="0.8"/>
+      <text x="55" y="18" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="9.5" fill="#5A9AE0" font-weight="500">Gemini 2.0</text>
+    </g>
+    <g transform="translate(500, 25)">
+      <!-- Pydantic -->
+      <rect x="0" y="0" width="110" height="28" rx="5" fill="#12304A" stroke="#0B8A84" stroke-width="0.8" opacity="0.8"/>
+      <text x="55" y="18" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="9.5" fill="#4DBEB8" font-weight="500">Pydantic v2</text>
+    </g>
+    <g transform="translate(630, 25)">
+      <!-- Streamlit -->
+      <rect x="0" y="0" width="110" height="28" rx="5" fill="#12304A" stroke="#0B8A84" stroke-width="0.8" opacity="0.8"/>
+      <text x="55" y="18" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="9.5" fill="#4DBEB8" font-weight="500">Streamlit</text>
+    </g>
+    <g transform="translate(760, 25)">
+      <!-- PyMuPDF -->
+      <rect x="0" y="0" width="110" height="28" rx="5" fill="#12304A" stroke="#1A3A5C" stroke-width="0.8" opacity="0.8"/>
+      <text x="55" y="18" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="9.5" fill="#7EA8D4" font-weight="500">PyMuPDF</text>
+    </g>
+    <g transform="translate(890, 25)">
+      <!-- SQLite -->
+      <rect x="0" y="0" width="110" height="28" rx="5" fill="#12304A" stroke="#1A3A5C" stroke-width="0.8" opacity="0.8"/>
+      <text x="55" y="18" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="9.5" fill="#7EA8D4" font-weight="500">SQLite</text>
+    </g>
+    <g transform="translate(1020, 25)">
+      <!-- Python -->
+      <rect x="0" y="0" width="110" height="28" rx="5" fill="#12304A" stroke="#F59E0B" stroke-width="0.8" opacity="0.6"/>
+      <text x="55" y="18" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="9.5" fill="#F5C96B" font-weight="500">Python ≥3.10</text>
+    </g>
+  </g>
+
+  <!-- ========== CONCEPTUAL FLOW LABELS ========== -->
+  <g transform="translate(0, 730)">
+    <!-- Flow label bar -->
+    <rect x="240" y="0" width="1120" height="40" rx="8" fill="#0A1E33" stroke="#1A3A5C" stroke-width="0.5" opacity="0.6"/>
+
+    <!-- Flow steps -->
+    <text x="340" y="25" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="12" fill="#5A9AE0" font-weight="500">Documento</text>
+    <text x="440" y="25" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="14" fill="#2864C7" opacity="0.5">→</text>
+    <text x="560" y="25" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="12" fill="#4DBEB8" font-weight="500">Conhecimento Estruturado</text>
+    <text x="690" y="25" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="14" fill="#0B8A84" opacity="0.5">→</text>
+    <text x="800" y="25" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="12" fill="#9AB8D8" font-weight="500">Comparação</text>
+    <text x="890" y="25" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="14" fill="#197B5C" opacity="0.5">→</text>
+    <text x="1020" y="25" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="12" fill="#3AAF8A" font-weight="500">Decisão Assistida</text>
+    <text x="1160" y="25" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="14" fill="#197B5C" opacity="0.5">→</text>
+    <text x="1280" y="25" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="12" fill="#F5C96B" font-weight="500" opacity="0.8">Evidência</text>
+  </g>
+
+  <!-- ========== BOTTOM ATTRIBUTION ========== -->
+  <text x="800" y="835" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="12" fill="#4A6B8A" font-weight="400" letter-spacing="1.5">
+    I2A2 · Instituto de Inteligência Artificial Aplicada · 2026
+  </text>
+
+  <!-- ========== DECORATIVE CORNER ELEMENTS ========== -->
+  <!-- Top-left corner -->
+  <path d="M 30 30 L 30 70 M 30 30 L 70 30" stroke="#2864C7" stroke-width="1.5" opacity="0.25" stroke-linecap="round"/>
+  <!-- Top-right corner -->
+  <path d="M 1570 30 L 1570 70 M 1570 30 L 1530 30" stroke="#0B8A84" stroke-width="1.5" opacity="0.25" stroke-linecap="round"/>
+  <!-- Bottom-left corner -->
+  <path d="M 30 870 L 30 830 M 30 870 L 70 870" stroke="#2864C7" stroke-width="1.5" opacity="0.15" stroke-linecap="round"/>
+  <!-- Bottom-right corner -->
+  <path d="M 1570 870 L 1570 830 M 1570 870 L 1530 870" stroke="#0B8A84" stroke-width="1.5" opacity="0.15" stroke-linecap="round"/>
+
+  <!-- Bottom accent line -->
+  <rect x="0" y="897" width="1600" height="3" fill="url(#accentLine)"/>
+</svg>

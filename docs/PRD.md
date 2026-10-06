@@ -130,6 +130,8 @@ O sistema **DEVE** identificar e extrair as seguintes categorias de informação
 - A interface **DEVE** indicar o progresso de processamento
 - A interface **DEVE** exibir mensagens de erro claras e acionáveis
 
+> Para a documentação técnica aprofundada da interface, design system Dark Obsidian, fluxos de UX e wireframes de cada tela, consulte o [Índice Mestre do Frontend](./frontend/00_FRONTEND_MASTER_INDEX.md).
+
 ---
 
 ## 4. Requisitos Não-Funcionais

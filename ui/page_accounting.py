@@ -208,7 +208,7 @@ def render_accounting_page():
 
     st.markdown("### 📄 Parecer Técnico Estruturado")
     st.markdown(f"""
-        <div style="background-color: #FFFFFF; border: 1px solid #D6E0EA; border-left: 5px solid #0F2B48; padding: 24px; border-radius: 8px; margin-top: 12px; box-shadow: 0 4px 12px rgba(15, 43, 72, 0.05);">
+        <div style="background: linear-gradient(135deg, rgba(15, 23, 42, 0.95) 0%, rgba(30, 41, 59, 0.8) 100%); border: 1px solid rgba(14, 165, 233, 0.3); border-left: 5px solid #0EA5E9; padding: 24px; border-radius: 12px; margin-top: 12px; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4); color: #F1F5F9;">
             {justificativa_atual}
         </div>
     """, unsafe_allow_html=True)

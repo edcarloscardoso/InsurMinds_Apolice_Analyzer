@@ -1,0 +1,421 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 940" width="1400" height="940">
+  <defs>
+    <!-- Background Gradients -->
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#081729"/>
+      <stop offset="50%" stop-color="#0D223B"/>
+      <stop offset="100%" stop-color="#061220"/>
+    </linearGradient>
+
+    <!-- Header Gradient -->
+    <linearGradient id="headerGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#F59E0B" stop-opacity="0"/>
+      <stop offset="20%" stop-color="#F59E0B"/>
+      <stop offset="50%" stop-color="#2864C7"/>
+      <stop offset="80%" stop-color="#00D2FF"/>
+      <stop offset="100%" stop-color="#00D2FF" stop-opacity="0"/>
+    </linearGradient>
+
+    <!-- Pipeline Container Gradients -->
+    <linearGradient id="panelGrad1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0F243E"/>
+      <stop offset="100%" stop-color="#0A182B"/>
+    </linearGradient>
+
+    <linearGradient id="panelGrad2" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#142642"/>
+      <stop offset="100%" stop-color="#0C192E"/>
+    </linearGradient>
+
+    <!-- Node Gradients -->
+    <linearGradient id="startNodeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1E3A8A"/>
+      <stop offset="100%" stop-color="#172554"/>
+    </linearGradient>
+
+    <linearGradient id="agentNodeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#16375E"/>
+      <stop offset="100%" stop-color="#0E233E"/>
+    </linearGradient>
+
+    <linearGradient id="compNodeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#2D2816"/>
+      <stop offset="100%" stop-color="#19160A"/>
+    </linearGradient>
+
+    <linearGradient id="reportNodeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#113E3B"/>
+      <stop offset="100%" stop-color="#092422"/>
+    </linearGradient>
+
+    <linearGradient id="dbGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0E3D48"/>
+      <stop offset="100%" stop-color="#082229"/>
+    </linearGradient>
+
+    <linearGradient id="endNodeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1E293B"/>
+      <stop offset="100%" stop-color="#0F172A"/>
+    </linearGradient>
+
+    <linearGradient id="errorNodeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#451A1A"/>
+      <stop offset="100%" stop-color="#2A0F0F"/>
+    </linearGradient>
+
+    <linearGradient id="cacheNodeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1A3A35"/>
+      <stop offset="100%" stop-color="#0F2420"/>
+    </linearGradient>
+
+    <!-- Filters -->
+    <filter id="nodeShadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#000000" flood-opacity="0.5"/>
+    </filter>
+    <filter id="panelShadow" x="-5%" y="-5%" width="110%" height="110%">
+      <feDropShadow dx="0" dy="6" stdDeviation="10" flood-color="#000000" flood-opacity="0.4"/>
+    </filter>
+    <filter id="cyanGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="3" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+
+    <!-- Markers -->
+    <marker id="arrowCyan" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
+      <path d="M 1 1 L 7 4 L 1 7 Z" fill="#00D2FF"/>
+    </marker>
+    <marker id="arrowGold" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
+      <path d="M 1 1 L 7 4 L 1 7 Z" fill="#FBBF24"/>
+    </marker>
+    <marker id="arrowTeal" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
+      <path d="M 1 1 L 7 4 L 1 7 Z" fill="#2DD4BF"/>
+    </marker>
+    <marker id="arrowRed" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
+      <path d="M 1 1 L 7 4 L 1 7 Z" fill="#F87171"/>
+    </marker>
+    <marker id="arrowGreen" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
+      <path d="M 1 1 L 7 4 L 1 7 Z" fill="#34D399"/>
+    </marker>
+
+    <!-- Patterns -->
+    <pattern id="gridPattern" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#163152" stroke-width="0.5" opacity="0.35"/>
+    </pattern>
+    <pattern id="dotPattern" width="20" height="20" patternUnits="userSpaceOnUse">
+      <circle cx="10" cy="10" r="0.8" fill="#2864C7" opacity="0.18"/>
+    </pattern>
+  </defs>
+
+  <!-- ================= BACKGROUND ================= -->
+  <rect width="1400" height="940" fill="url(#bgGrad)"/>
+  <rect width="1400" height="940" fill="url(#gridPattern)"/>
+  <rect width="1400" height="940" fill="url(#dotPattern)"/>
+
+  <!-- Radial Accents -->
+  <ellipse cx="250" cy="200" rx="350" ry="250" fill="#2864C7" opacity="0.05"/>
+  <ellipse cx="1150" cy="400" rx="350" ry="250" fill="#00D2FF" opacity="0.05"/>
+  <ellipse cx="600" cy="750" rx="400" ry="250" fill="#F59E0B" opacity="0.04"/>
+
+  <!-- Top Line -->
+  <rect x="0" y="0" width="1400" height="3" fill="url(#headerGrad)"/>
+
+  <!-- ================= HEADER SECTION ================= -->
+  <g transform="translate(60, 45)">
+    <!-- Pill Badge -->
+    <rect x="0" y="0" width="275" height="26" rx="13" fill="#132B4C" stroke="#2864C7" stroke-width="1"/>
+    <circle cx="14" cy="13" r="4" fill="#F59E0B" filter="url(#cyanGlow)"/>
+    <text x="26" y="17" font-family="'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="11" font-weight="700" fill="#93C5FD" letter-spacing="1.5">LANGGRAPH STATEGRAPH WORKFLOW</text>
+
+    <!-- Main Title -->
+    <text x="0" y="58" font-family="'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="28" font-weight="800" fill="#FFFFFF" letter-spacing="0.5">
+      Arquitetura Multi-Agente: Grafos de Estados Finitos
+    </text>
+
+    <!-- Subtitle -->
+    <text x="0" y="82" font-family="'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="13.5" font-weight="400" fill="#8FAFCF">
+      Dois grafos de estado compilados em singleton: Pipeline de Ingestão/Estruturação e Pipeline de Confronto/Parecer Executivo.
+    </text>
+  </g>
+
+  <!-- ================= PIPELINE 1: DOCUMENT GRAPH ================= -->
+  <g transform="translate(60, 155)" filter="url(#panelShadow)">
+    <!-- Panel Container -->
+    <rect width="1280" height="340" rx="14" fill="url(#panelGrad1)" stroke="#1D3E66" stroke-width="1.5"/>
+
+    <!-- Panel Header Banner -->
+    <path d="M 0 14 Q 0 0 14 0 L 1266 0 Q 1280 0 1280 14 L 1280 40 L 0 40 Z" fill="#0C1D33"/>
+    <line x1="0" y1="40" x2="1280" y2="40" stroke="#1D3E66" stroke-width="1"/>
+
+    <rect x="20" y="10" width="10" height="20" rx="3" fill="#00D2FF"/>
+    <text x="38" y="25" font-family="'Segoe UI', Arial, sans-serif" font-size="13" font-weight="700" fill="#FFFFFF" letter-spacing="0.8">
+      GRAFO 1: PIPELINE DE INGESTÃO E ESTRUTURAÇÃO
+    </text>
+    <text x="445" y="25" font-family="'Courier New', monospace" font-size="11.5" fill="#60A5FA">
+      build_document_graph() · State: DocumentState
+    </text>
+
+    <!-- Pipeline 1 Flow Elements -->
+
+    <!-- START NODE -->
+    <g transform="translate(30, 95)" filter="url(#nodeShadow)">
+      <rect width="75" height="50" rx="25" fill="url(#startNodeGrad)" stroke="#3B82F6" stroke-width="1.5"/>
+      <text x="37" y="30" font-family="'Segoe UI', Arial, sans-serif" font-size="12" font-weight="800" fill="#93C5FD" text-anchor="middle">START</text>
+    </g>
+
+    <!-- Arrow START -> RECEPTION -->
+    <line x1="105" y1="120" x2="148" y2="120" stroke="#00D2FF" stroke-width="2" marker-end="url(#arrowCyan)"/>
+
+    <!-- NODE 1: RECEPTION AGENT -->
+    <g transform="translate(155, 65)" filter="url(#nodeShadow)">
+      <rect width="210" height="110" rx="10" fill="url(#agentNodeGrad)" stroke="#2563EB" stroke-width="1.5"/>
+      <rect x="0" y="0" width="210" height="4" rx="2" fill="#3B82F6"/>
+
+      <text x="16" y="26" font-family="'Segoe UI', Arial, sans-serif" font-size="10.5" font-weight="700" fill="#60A5FA" letter-spacing="1">AGENTE 1</text>
+      <text x="16" y="46" font-family="'Segoe UI', Arial, sans-serif" font-size="15" font-weight="700" fill="#FFFFFF">Reception Agent</text>
+      <text x="16" y="63" font-family="'Courier New', monospace" font-size="10" fill="#93C5FD">reception_agent</text>
+
+      <line x1="16" y1="72" x2="194" y2="72" stroke="#1E3E66" stroke-width="1"/>
+      <text x="16" y="87" font-family="'Segoe UI', Arial, sans-serif" font-size="10.5" fill="#CADDF2">• Magic bytes (%PDF-, PNG, JPG)</text>
+      <text x="16" y="100" font-family="'Segoe UI', Arial, sans-serif" font-size="10.5" fill="#CADDF2">• Deduplicação MD5 &amp; Max 30MB</text>
+    </g>
+
+    <!-- CONDITIONAL ROUTER (DIAMOND) -->
+    <g transform="translate(405, 95)">
+      <polygon points="25,0 50,25 25,50 0,25" fill="#172F4D" stroke="#00D2FF" stroke-width="1.5"/>
+      <text x="25" y="29" font-family="'Segoe UI', Arial, sans-serif" font-size="9" font-weight="700" fill="#00D2FF" text-anchor="middle">ROUTER</text>
+    </g>
+
+    <!-- Arrow RECEPTION -> ROUTER -->
+    <line x1="365" y1="120" x2="400" y2="120" stroke="#00D2FF" stroke-width="2" marker-end="url(#arrowCyan)"/>
+
+    <!-- CONDITIONAL BRANCH 1: ERRO DE VALIDAÇÃO -> END -->
+    <path d="M 430 95 L 430 65 L 475 65" fill="none" stroke="#F87171" stroke-width="1.5" stroke-dasharray="4 3" marker-end="url(#arrowRed)"/>
+    <text x="440" y="58" font-family="'Segoe UI', Arial, sans-serif" font-size="9.5" font-weight="600" fill="#F87171">status == erro</text>
+
+    <g transform="translate(480, 50)" filter="url(#nodeShadow)">
+      <rect width="110" height="30" rx="15" fill="url(#errorNodeGrad)" stroke="#EF4444" stroke-width="1"/>
+      <text x="55" y="19" font-family="'Segoe UI', Arial, sans-serif" font-size="10.5" font-weight="700" fill="#FCA5A5" text-anchor="middle">END (Erro)</text>
+    </g>
+
+    <!-- CONDITIONAL BRANCH 2: CACHE HIT -> END -->
+    <path d="M 430 145 L 430 180 L 475 180" fill="none" stroke="#34D399" stroke-width="1.5" stroke-dasharray="4 3" marker-end="url(#arrowGreen)"/>
+    <text x="440" y="195" font-family="'Segoe UI', Arial, sans-serif" font-size="9.5" font-weight="600" fill="#34D399">cache hit (MD5)</text>
+
+    <g transform="translate(480, 165)" filter="url(#nodeShadow)">
+      <rect width="110" height="30" rx="15" fill="url(#cacheNodeGrad)" stroke="#10B981" stroke-width="1"/>
+      <text x="55" y="19" font-family="'Segoe UI', Arial, sans-serif" font-size="10.5" font-weight="700" fill="#6EE7B7" text-anchor="middle">END (Cache)</text>
+    </g>
+
+    <!-- ROUTER -> EXTRACTOR (NORMAL FLOW) -->
+    <line x1="455" y1="120" x2="628" y2="120" stroke="#00D2FF" stroke-width="2" marker-end="url(#arrowCyan)"/>
+    <text x="520" y="113" font-family="'Segoe UI', Arial, sans-serif" font-size="10" font-weight="700" fill="#00D2FF">processando</text>
+
+    <!-- NODE 2: EXTRACTOR AGENT -->
+    <g transform="translate(635, 65)" filter="url(#nodeShadow)">
+      <rect width="190" height="110" rx="10" fill="url(#agentNodeGrad)" stroke="#0284C7" stroke-width="1.5"/>
+      <rect x="0" y="0" width="190" height="4" rx="2" fill="#00D2FF"/>
+
+      <text x="14" y="26" font-family="'Segoe UI', Arial, sans-serif" font-size="10.5" font-weight="700" fill="#38BDF8" letter-spacing="1">AGENTE 2</text>
+      <text x="14" y="46" font-family="'Segoe UI', Arial, sans-serif" font-size="15" font-weight="700" fill="#FFFFFF">Extractor Agent</text>
+      <text x="14" y="63" font-family="'Courier New', monospace" font-size="10" fill="#7DD3FC">extractor_agent</text>
+
+      <line x1="14" y1="72" x2="176" y2="72" stroke="#163F66" stroke-width="1"/>
+      <text x="14" y="87" font-family="'Segoe UI', Arial, sans-serif" font-size="10.5" fill="#CADDF2">• pdfplumber (digital)</text>
+      <text x="14" y="100" font-family="'Segoe UI', Arial, sans-serif" font-size="10.5" fill="#CADDF2">• Gemini Vision / Tesseract</text>
+    </g>
+
+    <!-- Arrow EXTRACTOR -> IDENTIFIER -->
+    <line x1="825" y1="120" x2="863" y2="120" stroke="#00D2FF" stroke-width="2" marker-end="url(#arrowCyan)"/>
+
+    <!-- NODE 3: IDENTIFIER AGENT -->
+    <g transform="translate(870, 65)" filter="url(#nodeShadow)">
+      <rect width="180" height="110" rx="10" fill="url(#agentNodeGrad)" stroke="#2563EB" stroke-width="1.5"/>
+      <rect x="0" y="0" width="180" height="4" rx="2" fill="#3B82F6"/>
+
+      <text x="14" y="26" font-family="'Segoe UI', Arial, sans-serif" font-size="10.5" font-weight="700" fill="#60A5FA" letter-spacing="1">AGENTE 3</text>
+      <text x="14" y="46" font-family="'Segoe UI', Arial, sans-serif" font-size="15" font-weight="700" fill="#FFFFFF">Identifier Agent</text>
+      <text x="14" y="63" font-family="'Courier New', monospace" font-size="10" fill="#93C5FD">identifier_agent</text>
+
+      <line x1="14" y1="72" x2="166" y2="72" stroke="#1E3E66" stroke-width="1"/>
+      <text x="14" y="87" font-family="'Segoe UI', Arial, sans-serif" font-size="10.5" fill="#CADDF2">• SUSEP 637/2021 (0378)</text>
+      <text x="14" y="100" font-family="'Segoe UI', Arial, sans-serif" font-size="10.5" fill="#CADDF2">• Segmentação de cláusulas</text>
+    </g>
+
+    <!-- Arrow IDENTIFIER -> STRUCTURER -->
+    <line x1="1050" y1="120" x2="1083" y2="120" stroke="#00D2FF" stroke-width="2" marker-end="url(#arrowCyan)"/>
+
+    <!-- NODE 4: STRUCTURER AGENT -->
+    <g transform="translate(1090, 65)" filter="url(#nodeShadow)">
+      <rect width="170" height="110" rx="10" fill="url(#agentNodeGrad)" stroke="#059669" stroke-width="1.5"/>
+      <rect x="0" y="0" width="170" height="4" rx="2" fill="#10B981"/>
+
+      <text x="14" y="26" font-family="'Segoe UI', Arial, sans-serif" font-size="10.5" font-weight="700" fill="#34D399" letter-spacing="1">AGENTE 4</text>
+      <text x="14" y="46" font-family="'Segoe UI', Arial, sans-serif" font-size="15" font-weight="700" fill="#FFFFFF">Structurer Agent</text>
+      <text x="14" y="63" font-family="'Courier New', monospace" font-size="10" fill="#6EE7B7">structurer_agent</text>
+
+      <line x1="14" y1="72" x2="156" y2="72" stroke="#144C3F" stroke-width="1"/>
+      <text x="14" y="87" font-family="'Segoe UI', Arial, sans-serif" font-size="10.5" fill="#CADDF2">• Schema Pydantic v2</text>
+      <text x="14" y="100" font-family="'Segoe UI', Arial, sans-serif" font-size="10.5" fill="#CADDF2">• Instanciação ApoliceDAO</text>
+    </g>
+
+    <!-- STRUCTURER -> SQLITE / PERSISTENCE (DOWNWARD ARROW) -->
+    <path d="M 1175 175 L 1175 220" fill="none" stroke="#10B981" stroke-width="2" marker-end="url(#arrowGreen)"/>
+
+    <!-- SQLITE DATABASE BADGE -->
+    <g transform="translate(1070, 230)" filter="url(#nodeShadow)">
+      <rect width="180" height="55" rx="8" fill="url(#dbGrad)" stroke="#14B8A6" stroke-width="1.5"/>
+      <ellipse cx="25" cy="27" rx="10" ry="12" fill="#0E2E36" stroke="#14B8A6" stroke-width="1"/>
+      <line x1="15" y1="23" x2="35" y2="23" stroke="#14B8A6" stroke-width="1"/>
+      <line x1="15" y1="28" x2="35" y2="28" stroke="#14B8A6" stroke-width="1"/>
+      <text x="45" y="24" font-family="'Segoe UI', Arial, sans-serif" font-size="12" font-weight="700" fill="#FFFFFF">SQLite: apolices.db</text>
+      <text x="45" y="42" font-family="'Courier New', monospace" font-size="10.5" fill="#5EEAD4">ApoliceDAO (ACID)</text>
+    </g>
+
+    <!-- DATABASE -> END -->
+    <path d="M 1070 255 L 1020 255" fill="none" stroke="#10B981" stroke-width="2" marker-end="url(#arrowGreen)"/>
+    <g transform="translate(900, 235)" filter="url(#nodeShadow)">
+      <rect width="110" height="40" rx="20" fill="url(#endNodeGrad)" stroke="#10B981" stroke-width="1.5"/>
+      <text x="55" y="25" font-family="'Segoe UI', Arial, sans-serif" font-size="12" font-weight="800" fill="#34D399" text-anchor="middle">END</text>
+    </g>
+
+    <!-- Annotations on Pipeline 1 -->
+    <g transform="translate(30, 240)">
+      <rect width="840" height="50" rx="8" fill="#0A1624" stroke="#152B44" stroke-width="1"/>
+      <text x="20" y="22" font-family="'Segoe UI', Arial, sans-serif" font-size="11" font-weight="700" fill="#60A5FA">INTERAÇÃO COM A UI STREAMLIT:</text>
+      <text x="20" y="38" font-family="'Segoe UI', Arial, sans-serif" font-size="11" fill="#93C5FD">
+        Função <tspan font-family="monospace" fill="#38BDF8">run_document_pipeline_with_progress()</tspan> despacha eventos em tempo real para a barra de progresso e timeline de agentes.
+      </text>
+    </g>
+  </g>
+
+  <!-- ================= PIPELINE 2: COMPARISON & REPORTING GRAPH ================= -->
+  <g transform="translate(60, 520)" filter="url(#panelShadow)">
+    <!-- Panel Container -->
+    <rect width="1280" height="340" rx="14" fill="url(#panelGrad2)" stroke="#2D3A54" stroke-width="1.5"/>
+
+    <!-- Panel Header Banner -->
+    <path d="M 0 14 Q 0 0 14 0 L 1266 0 Q 1280 0 1280 14 L 1280 40 L 0 40 Z" fill="#181E30"/>
+    <line x1="0" y1="40" x2="1280" y2="40" stroke="#2D3A54" stroke-width="1"/>
+
+    <rect x="20" y="10" width="10" height="20" rx="3" fill="#F59E0B"/>
+    <text x="38" y="25" font-family="'Segoe UI', Arial, sans-serif" font-size="13" font-weight="700" fill="#FFFFFF" letter-spacing="0.8">
+      GRAFO 2: PIPELINE DE COMPARAÇÃO &amp; PARECER EXECUTIVO
+    </text>
+    <text x="495" y="25" font-family="'Courier New', monospace" font-size="11.5" fill="#FBBF24">
+      build_comparison_graph() · State: ComparisonState
+    </text>
+
+    <!-- Inputs from SQLite -->
+    <g transform="translate(30, 80)">
+      <rect width="210" height="150" rx="10" fill="#101D30" stroke="#1E3E66" stroke-width="1.5"/>
+      <text x="16" y="26" font-family="'Segoe UI', Arial, sans-serif" font-size="11" font-weight="700" fill="#60A5FA" letter-spacing="1">CARGA DA BIBLIOTECA</text>
+
+      <!-- Doc A -->
+      <g transform="translate(16, 40)">
+        <rect width="178" height="42" rx="6" fill="#142B48" stroke="#2563EB" stroke-width="1"/>
+        <text x="10" y="18" font-family="'Segoe UI', Arial, sans-serif" font-size="11" font-weight="700" fill="#FFFFFF">Apólice A (Proposta Base)</text>
+        <text x="10" y="32" font-family="'Segoe UI', Arial, sans-serif" font-size="9.5" fill="#93C5FD">DAO instanciado do SQLite</text>
+      </g>
+
+      <!-- Doc B -->
+      <g transform="translate(16, 92)">
+        <rect width="178" height="42" rx="6" fill="#0D3538" stroke="#0D9488" stroke-width="1"/>
+        <text x="10" y="18" font-family="'Segoe UI', Arial, sans-serif" font-size="11" font-weight="700" fill="#FFFFFF">Apólice B (Comparativa)</text>
+        <text x="10" y="32" font-family="'Segoe UI', Arial, sans-serif" font-size="9.5" fill="#5EEAD4">DAO instanciado do SQLite</text>
+      </g>
+    </g>
+
+    <!-- Arrow INPUTS -> START -->
+    <line x1="240" y1="155" x2="288" y2="155" stroke="#F59E0B" stroke-width="2" marker-end="url(#arrowGold)"/>
+
+    <!-- START NODE (GRAPH 2) -->
+    <g transform="translate(295, 130)" filter="url(#nodeShadow)">
+      <rect width="75" height="50" rx="25" fill="url(#startNodeGrad)" stroke="#F59E0B" stroke-width="1.5"/>
+      <text x="37" y="30" font-family="'Segoe UI', Arial, sans-serif" font-size="12" font-weight="800" fill="#FDE68A" text-anchor="middle">START</text>
+    </g>
+
+    <!-- Arrow START -> COMPARATOR -->
+    <line x1="370" y1="155" x2="423" y2="155" stroke="#F59E0B" stroke-width="2" marker-end="url(#arrowGold)"/>
+
+    <!-- NODE 5: COMPARATOR AGENT -->
+    <g transform="translate(430, 95)" filter="url(#nodeShadow)">
+      <rect width="280" height="120" rx="10" fill="url(#compNodeGrad)" stroke="#D97706" stroke-width="1.5"/>
+      <rect x="0" y="0" width="280" height="4" rx="2" fill="#F59E0B"/>
+
+      <text x="16" y="26" font-family="'Segoe UI', Arial, sans-serif" font-size="10.5" font-weight="700" fill="#FBBF24" letter-spacing="1">AGENTE 5</text>
+      <text x="16" y="48" font-family="'Segoe UI', Arial, sans-serif" font-size="16" font-weight="700" fill="#FFFFFF">Comparator Agent</text>
+      <text x="16" y="66" font-family="'Courier New', monospace" font-size="10" fill="#FCD34D">agents/comparator_agent.py</text>
+
+      <line x1="16" y1="76" x2="264" y2="76" stroke="#4A3B18" stroke-width="1"/>
+      <text x="16" y="93" font-family="'Segoe UI', Arial, sans-serif" font-size="11" fill="#FEF3C7">• Diff de cláusulas &amp; Jaccard Score</text>
+      <text x="16" y="108" font-family="'Segoe UI', Arial, sans-serif" font-size="11" fill="#FEF3C7">• Confronto LMG, Franquias e Prazos</text>
+    </g>
+
+    <!-- Arrow COMPARATOR -> REPORTER -->
+    <line x1="710" y1="155" x2="768" y2="155" stroke="#F59E0B" stroke-width="2" marker-end="url(#arrowGold)"/>
+
+    <!-- NODE 6: REPORTER AGENT -->
+    <g transform="translate(775, 95)" filter="url(#nodeShadow)">
+      <rect width="280" height="120" rx="10" fill="url(#reportNodeGrad)" stroke="#0D9488" stroke-width="1.5"/>
+      <rect x="0" y="0" width="280" height="4" rx="2" fill="#14B8A6"/>
+
+      <text x="16" y="26" font-family="'Segoe UI', Arial, sans-serif" font-size="10.5" font-weight="700" fill="#2DD4BF" letter-spacing="1">AGENTE 6</text>
+      <text x="16" y="48" font-family="'Segoe UI', Arial, sans-serif" font-size="16" font-weight="700" fill="#FFFFFF">Reporter Agent</text>
+      <text x="16" y="66" font-family="'Courier New', monospace" font-size="10" fill="#5EEAD4">agents/reporter_agent.py</text>
+
+      <line x1="16" y1="76" x2="264" y2="76" stroke="#124E48" stroke-width="1"/>
+      <text x="16" y="93" font-family="'Segoe UI', Arial, sans-serif" font-size="11" fill="#CCFBF1">• Síntese executiva D&amp;O narrativa</text>
+      <text x="16" y="108" font-family="'Segoe UI', Arial, sans-serif" font-size="11" fill="#CCFBF1">• Rastreabilidade EvidenceItem (página + snippet)</text>
+    </g>
+
+    <!-- Arrow REPORTER -> END -->
+    <line x1="1055" y1="155" x2="1108" y2="155" stroke="#2DD4BF" stroke-width="2" marker-end="url(#arrowTeal)"/>
+
+    <!-- END NODE (GRAPH 2) -->
+    <g transform="translate(1115, 130)" filter="url(#nodeShadow)">
+      <rect width="130" height="50" rx="25" fill="url(#endNodeGrad)" stroke="#2DD4BF" stroke-width="1.5"/>
+      <text x="65" y="30" font-family="'Segoe UI', Arial, sans-serif" font-size="12" font-weight="800" fill="#5EEAD4" text-anchor="middle">END (Report)</text>
+    </g>
+
+    <!-- Deliverables Strip below Pipeline 2 -->
+    <g transform="translate(30, 250)">
+      <rect width="1220" height="65" rx="8" fill="#0C1420" stroke="#1C2E46" stroke-width="1"/>
+
+      <text x="25" y="24" font-family="'Segoe UI', Arial, sans-serif" font-size="11" font-weight="700" fill="#FBBF24">OUTPUTS GERADOS:</text>
+
+      <!-- Pill 1 -->
+      <rect x="160" y="14" width="220" height="36" rx="6" fill="#14263D" stroke="#2563EB" stroke-width="1"/>
+      <text x="175" y="36" font-family="'Segoe UI', Arial, sans-serif" font-size="11.5" font-weight="600" fill="#93C5FD">📋 Parecer Executivo Narrativo</text>
+
+      <!-- Pill 2 -->
+      <rect x="400" y="14" width="260" height="36" rx="6" fill="#123338" stroke="#0D9488" stroke-width="1"/>
+      <text x="415" y="36" font-family="'Segoe UI', Arial, sans-serif" font-size="11.5" font-weight="600" fill="#5EEAD4">🔍 EvidenceItem (Página, Snippet, Confiança)</text>
+
+      <!-- Pill 3 -->
+      <rect x="680" y="14" width="250" height="36" rx="6" fill="#2E2413" stroke="#D97706" stroke-width="1"/>
+      <text x="695" y="36" font-family="'Segoe UI', Arial, sans-serif" font-size="11.5" font-weight="600" fill="#FDE68A">⚖️ Matriz de Gaps &amp; Jaccard Similarity</text>
+
+      <!-- Pill 4 -->
+      <rect x="950" y="14" width="245" height="36" rx="6" fill="#1A182E" stroke="#7C3AED" stroke-width="1"/>
+      <text x="965" y="36" font-family="'Segoe UI', Arial, sans-serif" font-size="11.5" font-weight="600" fill="#C4B5FD">💾 Exportação em JSON e Markdown</text>
+    </g>
+  </g>
+
+  <!-- ================= BOTTOM STRIP ================= -->
+  <g transform="translate(60, 885)">
+    <rect width="1280" height="34" rx="8" fill="#0A1828" stroke="#163152" stroke-width="1"/>
+
+    <text x="25" y="21" font-family="'Segoe UI', Arial, sans-serif" font-size="11" font-weight="700" fill="#5885B5">PROPRIEDADES DA MÁQUINA DE ESTADOS:</text>
+
+    <text x="280" y="21" font-family="'Segoe UI', Arial, sans-serif" font-size="11" fill="#A0C0E0">Grafos Determinísticos (StateGraph)</text>
+    <circle cx="510" cy="17" r="2.5" fill="#2864C7"/>
+
+    <text x="530" y="21" font-family="'Segoe UI', Arial, sans-serif" font-size="11" fill="#A0C0E0">Zero Side-Effects entre Execuções</text>
+    <circle cx="750" cy="17" r="2.5" fill="#2864C7"/>
+
+    <text x="770" y="21" font-family="'Segoe UI', Arial, sans-serif" font-size="11" fill="#A0C0E0">Transições Condicionais Tipadas</text>
+    <circle cx="975" cy="17" r="2.5" fill="#2864C7"/>
+
+    <text x="995" y="21" font-family="'Segoe UI', Arial, sans-serif" font-size="11" font-weight="600" fill="#00D2FF">Compilação Singleton em Memória</text>
+  </g>
+</svg>

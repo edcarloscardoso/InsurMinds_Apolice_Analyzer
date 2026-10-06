@@ -4,7 +4,7 @@ Responsabilidade: Validação, higienização de segurança, cálculo de hash cr
 from pathlib import Path
 import logging
 from core.schemas import DocumentState
-from core.security import validate_pdf_content, compute_file_hashes, get_safe_destination_path
+from core.security import validate_document_content, validate_pdf_content, compute_file_hashes, get_safe_destination_path
 from core.config import UPLOADS_DIR
 from core.database import db
 
@@ -28,12 +28,16 @@ def reception_agent(state: DocumentState) -> DocumentState:
         state.status = "erro"
         return state
 
-    # Validação de segurança (tamanho, formato e magic bytes)
-    is_valid, msg = validate_pdf_content(file_bytes, state.file_name)
+    # Validação de segurança (tamanho, formato e magic bytes para PDF e Imagens)
+    is_valid, msg, doc_format = validate_document_content(file_bytes, state.file_name)
     if not is_valid:
         state.errors.append(f"Falha na validação de segurança: {msg}")
         state.status = "erro"
         return state
+
+    state.document_format = doc_format
+    if doc_format == "image":
+        state.page_count = 1
 
     # Hashing para rastreabilidade e idempotência
     md5_hash, _ = compute_file_hashes(file_bytes)
@@ -41,12 +45,13 @@ def reception_agent(state: DocumentState) -> DocumentState:
     state.file_size = len(file_bytes)
 
     # Checagem de Idempotência no Banco de Dados
-    existing_apolice = db.get_apolice_by_id(md5_hash)
-    if existing_apolice:
-        logger.info(f"Agente 1: Documento {state.file_name} já previamente processado (Cache Hit). ID: {md5_hash}")
-        state.structured_data = existing_apolice
-        state.status = "concluido_em_cache"
-        return state
+    if not getattr(state, "force_reprocess", False):
+        existing_apolice = db.get_apolice_by_id(md5_hash)
+        if existing_apolice and existing_apolice.document_type != "unknown" and existing_apolice.evidencias:
+            logger.info(f"Agente 1: Documento {state.file_name} já previamente processado (Cache Hit). ID: {md5_hash}")
+            state.structured_data = existing_apolice
+            state.status = "concluido_em_cache"
+            return state
 
     state.status = "recepcionado"
     return state

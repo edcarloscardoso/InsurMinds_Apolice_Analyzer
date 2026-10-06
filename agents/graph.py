@@ -70,36 +70,37 @@ comparison_pipeline = build_comparison_graph()
 def run_document_pipeline_with_progress(
     file_path: str,
     file_name: str,
-    on_step_callback: Optional[Callable[[int, str, str], None]] = None
+    on_step_callback: Optional[Callable[[int, str, str], None]] = None,
+    force_reprocess: bool = False
 ) -> DocumentState:
     """Executa o pipeline dos Agentes 1 a 4 emitindo callbacks de progresso para a UI do Streamlit."""
-    initial_state = DocumentState(file_path=file_path, file_name=file_name)
+    initial_state = DocumentState(file_path=file_path, file_name=file_name, force_reprocess=force_reprocess)
     current_state = initial_state
 
     # Etapa 1: Reception
     if on_step_callback:
-        on_step_callback(1, "Agente 1 — Recepção", "Validando cabeçalhos PDF e calculando hash...")
+        on_step_callback(1, "Validação Documental", "Validando cabeçalhos e calculando hash de integridade...")
     current_state = reception_agent(current_state)
     if current_state.status in ("erro", "concluido_em_cache"):
         return current_state
 
     # Etapa 2: Extractor
     if on_step_callback:
-        on_step_callback(2, "Agente 2 — Extração", "Extraindo texto digital ou acionando fallback OCR...")
+        on_step_callback(2, "Extração de Conteúdo", "Extraindo texto digital ou executando OCR...")
     current_state = extractor_agent(current_state)
     if current_state.status == "erro":
         return current_state
 
     # Etapa 3: Identifier
     if on_step_callback:
-        on_step_callback(3, "Agente 3 — Identificação", "Segmentando cláusulas, coberturas e limites...")
+        on_step_callback(3, "Identificação Contratual", "Segmentando cláusulas, coberturas e limites...")
     current_state = identifier_agent(current_state)
     if current_state.status == "erro":
         return current_state
 
     # Etapa 4: Structurer
     if on_step_callback:
-        on_step_callback(4, "Agente 4 — Estruturação", "Mapeando dados canônicos e persistindo no banco...")
+        on_step_callback(4, "Estruturação e Evidências", "Mapeando dados canônicos e persistindo evidências auditáveis...")
     current_state = structurer_agent(current_state)
 
     return current_state
