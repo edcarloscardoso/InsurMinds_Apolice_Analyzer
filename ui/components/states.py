@@ -97,34 +97,44 @@ def render_fallback_state(
 
 
 def render_alert(
-    text: str,
-    alert_type: str = "info",  # "info", "success", "attention", "critical", "legal"
-    bold_prefix: Optional[str] = None
+    text: Optional[str] = None,
+    alert_type: str = "info",  # "info", "success", "attention", "critical", "legal", "warning"
+    bold_prefix: Optional[str] = None,
+    *,
+    message: Optional[str] = None,
+    level: Optional[str] = None
 ) -> None:
     """Renderiza um banner de alerta corporativo institucional."""
+    alert_text = text if text is not None else (message or "")
+    effective_type = level or alert_type or "info"
+    if effective_type == "warning":
+        effective_type = "attention"
+
     type_classes = {
         "info": "im-alert-info",
         "success": "im-alert-success",
         "attention": "im-alert-attention",
         "critical": "im-alert-critical",
-        "legal": "im-alert-legal"
+        "legal": "im-alert-legal",
+        "warning": "im-alert-attention"
     }
     icons = {
         "info": "ℹ",
         "success": "✓",
         "attention": "▲",
         "critical": "✕",
-        "legal": "🛡️"
+        "legal": "🛡️",
+        "warning": "▲"
     }
-    css_class = type_classes.get(alert_type, "im-alert-info")
-    icon = icons.get(alert_type, "ℹ")
+    css_class = type_classes.get(effective_type, "im-alert-info")
+    icon = icons.get(effective_type, "ℹ")
     prefix_html = f"<strong>{bold_prefix}</strong> " if bold_prefix else ""
 
     render_html(f"""
         <div class="im-alert {css_class}">
             <span class="im-alert-icon">{icon}</span>
             <div class="im-alert-body">
-                {prefix_html}{text}
+                {prefix_html}{alert_text}
             </div>
         </div>
     """)

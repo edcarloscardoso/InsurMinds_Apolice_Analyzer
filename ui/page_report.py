@@ -331,7 +331,7 @@ def render_report_page() -> None:
 
             render_html(f"<div style='margin-bottom:8px;'></div>")
     else:
-        render_alert("Não foram identificadas alterações substantivas nas cláusulas analisadas.", level="info")
+        render_alert("Não foram identificadas alterações substantivas nas cláusulas analisadas.", alert_type="info")
 
     render_html(f"<div style='margin-top:20px;'></div>")
 
