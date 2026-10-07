@@ -42,10 +42,24 @@ ALLOWED_DOCUMENT_EXTENSIONS = ALLOWED_EXTENSIONS
 # Banco de Dados
 DB_PATH = Path(os.getenv("DB_PATH", str(DATA_DIR / "apolices.db"))).resolve()
 
+def get_secret_or_env(key: str, default: str = "") -> str:
+    """Busca configuração em os.environ e fallback defensivo em st.secrets (Streamlit Community Cloud)."""
+    val = os.getenv(key)
+    if val:
+        return val
+    try:
+        import streamlit as st
+        if hasattr(st, "secrets") and key in st.secrets:
+            return str(st.secrets[key])
+    except Exception:
+        pass
+    return default
+
+
 # Configurações do Google Gemini
-GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY", "")
-GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-flash-lite-latest")
-GEMINI_VISION_MODEL = os.getenv("GEMINI_VISION_MODEL", "gemini-flash-lite-latest")
+GOOGLE_API_KEY = get_secret_or_env("GOOGLE_API_KEY") or get_secret_or_env("GEMINI_API_KEY", "")
+GEMINI_MODEL = get_secret_or_env("GEMINI_MODEL", "gemini-flash-lite-latest")
+GEMINI_VISION_MODEL = get_secret_or_env("GEMINI_VISION_MODEL", "gemini-flash-lite-latest")
 
 # Configurações do Servidor e Logging
 LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO")
@@ -63,10 +77,12 @@ def resolve_tessdata_dir() -> Optional[Path]:
        - %LOCALAPPDATA%\\Programs\\Tesseract-OCR\\tessdata
        - C:\\Program Files\\Tesseract-OCR\\tessdata
        - C:\\Program Files (x86)\\Tesseract-OCR\\tessdata
-    4. Linux / POSIX:
+    4. Linux / POSIX (incluindo Debian/Ubuntu no Streamlit Cloud):
+       - Caminho derivado de shutil.which("tesseract")
        - /usr/share/tessdata
        - /usr/share/tesseract-ocr/5/tessdata
        - /usr/share/tesseract-ocr/4.00/tessdata
+       - /usr/share/tesseract-ocr/tessdata
        - /usr/local/share/tessdata
     """
     # 1. TESSDATA_PREFIX existente
@@ -95,12 +111,24 @@ def resolve_tessdata_dir() -> Optional[Path]:
             Path(r"C:\Program Files (x86)\Tesseract-OCR\tessdata"),
         ])
     else:
-        candidates = [
+        import shutil
+        candidates = []
+        tess_bin = shutil.which("tesseract")
+        if tess_bin:
+            bin_p = Path(tess_bin).resolve()
+            candidates.extend([
+                bin_p.parent.parent / "share" / "tessdata",
+                bin_p.parent.parent / "share" / "tesseract-ocr" / "5" / "tessdata",
+                bin_p.parent.parent / "share" / "tesseract-ocr" / "4.00" / "tessdata",
+                bin_p.parent.parent / "share" / "tesseract-ocr" / "tessdata",
+            ])
+        candidates.extend([
             Path("/usr/share/tessdata"),
             Path("/usr/share/tesseract-ocr/5/tessdata"),
             Path("/usr/share/tesseract-ocr/4.00/tessdata"),
+            Path("/usr/share/tesseract-ocr/tessdata"),
             Path("/usr/local/share/tessdata"),
-        ]
+        ])
 
     for c in candidates:
         if c.is_dir():

@@ -8,7 +8,7 @@ from typing import Optional, List, Tuple
 import streamlit as st
 import pdfplumber
 
-from core.config import UPLOADS_DIR, DATASET_DO_DIR, MAX_FILE_SIZE_MB, GEMINI_MODEL, IMAGE_EXTENSIONS
+from core.config import UPLOADS_DIR, DATASET_DO_DIR, SAMPLE_POLICIES_DIR, MAX_FILE_SIZE_MB, GEMINI_MODEL, IMAGE_EXTENSIONS
 from core.security import get_safe_destination_path, validate_pdf_content, validate_document_content
 from core.database import db
 from core.schemas import ApoliceDAO
@@ -386,43 +386,83 @@ def _render_official_benchmarks():
             </div>
     """, unsafe_allow_html=True)
 
+    has_ext_sompo = (DATASET_DO_DIR / "DO_SOMPO_CONDICOES_GERAIS_V1_2_2024_010.pdf").exists()
+    has_samples = (SAMPLE_POLICIES_DIR / "apolice_do_allianz.pdf").exists() and (SAMPLE_POLICIES_DIR / "apolice_do_chubb.pdf").exists()
+
     col_bm1, col_bm2 = st.columns(2)
 
-    with col_bm1:
-        st.markdown(f"""
-            <div style="background:#F8FAFC; border:1px solid {COLORS.BORDER}; border-radius:6px; padding:14px; height:100%; display:flex; flex-direction:column; justify-content:space-between;">
-                <div>
-                    <div style="font-size:11px; font-weight:700; color:{COLORS.PRIMARY_BLUE}; text-transform:uppercase; margin-bottom:4px;">Par 1 · Sompo Seguros</div>
-                    <div style="font-weight:700; font-size:14px; color:{COLORS.PRIMARY_NAVY}; margin-bottom:6px;">Sompo v1.2 (2024) × Sompo v1.5 (2025)</div>
-                    <p style="font-size:12px; color:{COLORS.TEXT_MUTED}; line-height:1.4; margin-bottom:12px;">
-                        Avalia a evolução contratual: introdução da <b>Cláusula 18.6.1</b> (Agravamento do Risco) e alteração substantiva na <b>Cláusula 16.10</b> (Inadimplemento do Prêmio).
-                    </p>
+    if has_ext_sompo:
+        with col_bm1:
+            st.markdown(f"""
+                <div style="background:#F8FAFC; border:1px solid {COLORS.BORDER}; border-radius:6px; padding:14px; height:100%; display:flex; flex-direction:column; justify-content:space-between;">
+                    <div>
+                        <div style="font-size:11px; font-weight:700; color:{COLORS.PRIMARY_BLUE}; text-transform:uppercase; margin-bottom:4px;">Par 1 · Sompo Seguros</div>
+                        <div style="font-weight:700; font-size:14px; color:{COLORS.PRIMARY_NAVY}; margin-bottom:6px;">Sompo v1.2 (2024) × Sompo v1.5 (2025)</div>
+                        <p style="font-size:12px; color:{COLORS.TEXT_MUTED}; line-height:1.4; margin-bottom:12px;">
+                            Avalia a evolução contratual: introdução da <b>Cláusula 18.6.1</b> (Agravamento do Risco) e alteração substantiva na <b>Cláusula 16.10</b> (Inadimplemento do Prêmio).
+                        </p>
+                    </div>
                 </div>
-            </div>
-        """, unsafe_allow_html=True)
-        if st.button("Carregar Benchmark Sompo (DO010 × DO012)", key="btn_bm_sompo", type="secondary"):
-            _process_preset_pair(
-                "DO_SOMPO_CONDICOES_GERAIS_V1_2_2024_010.pdf",
-                "DO_SOMPO_CONDICOES_GERAIS_V1_5_2025_012.pdf"
-            )
+            """, unsafe_allow_html=True)
+            if st.button("Carregar Benchmark Sompo (DO010 × DO012)", key="btn_bm_sompo", type="secondary"):
+                _process_preset_pair(
+                    "DO_SOMPO_CONDICOES_GERAIS_V1_2_2024_010.pdf",
+                    "DO_SOMPO_CONDICOES_GERAIS_V1_5_2025_012.pdf"
+                )
 
-    with col_bm2:
-        st.markdown(f"""
-            <div style="background:#F8FAFC; border:1px solid {COLORS.BORDER}; border-radius:6px; padding:14px; height:100%; display:flex; flex-direction:column; justify-content:space-between;">
-                <div>
-                    <div style="font-size:11px; font-weight:700; color:{COLORS.SECONDARY_TEAL}; text-transform:uppercase; margin-bottom:4px;">Par 2 · Chubb Seguros</div>
-                    <div style="font-weight:700; font-size:14px; color:{COLORS.PRIMARY_NAVY}; margin-bottom:6px;">Chubb Oferta Pública 2024 × 2025</div>
-                    <p style="font-size:12px; color:{COLORS.TEXT_MUTED}; line-height:1.4; margin-bottom:12px;">
-                        Avalia a reestruturação contratual: inclusão de <b>Despesas de Contenção e Salvamento</b> e modificação substantiva nos <b>Custos de Defesa</b>.
-                    </p>
+        with col_bm2:
+            st.markdown(f"""
+                <div style="background:#F8FAFC; border:1px solid {COLORS.BORDER}; border-radius:6px; padding:14px; height:100%; display:flex; flex-direction:column; justify-content:space-between;">
+                    <div>
+                        <div style="font-size:11px; font-weight:700; color:{COLORS.SECONDARY_TEAL}; text-transform:uppercase; margin-bottom:4px;">Par 2 · Chubb Seguros</div>
+                        <div style="font-weight:700; font-size:14px; color:{COLORS.PRIMARY_NAVY}; margin-bottom:6px;">Chubb Oferta Pública 2024 × 2025</div>
+                        <p style="font-size:12px; color:{COLORS.TEXT_MUTED}; line-height:1.4; margin-bottom:12px;">
+                            Avalia a reestruturação contratual: inclusão de <b>Despesas de Contenção e Salvamento</b> e modificação substantiva nos <b>Custos de Defesa</b>.
+                        </p>
+                    </div>
                 </div>
-            </div>
-        """, unsafe_allow_html=True)
-        if st.button("Carregar Benchmark Chubb (DO005 × DO014)", key="btn_bm_chubb", type="secondary"):
-            _process_preset_pair(
-                "DO_CHUBB_CONDICOES_GERAIS_OFERTA_PUBLICA_2024_005.pdf",
-                "DO_CHUBB_CONDICOES_GERAIS_OFERTA_PUBLICA_2025_014.pdf"
-            )
+            """, unsafe_allow_html=True)
+            if st.button("Carregar Benchmark Chubb (DO005 × DO014)", key="btn_bm_chubb", type="secondary"):
+                _process_preset_pair(
+                    "DO_CHUBB_CONDICOES_GERAIS_OFERTA_PUBLICA_2024_005.pdf",
+                    "DO_CHUBB_CONDICOES_GERAIS_OFERTA_PUBLICA_2025_014.pdf"
+                )
+    else:
+        with col_bm1:
+            st.markdown(f"""
+                <div style="background:#F8FAFC; border:1px solid {COLORS.BORDER}; border-radius:6px; padding:14px; height:100%; display:flex; flex-direction:column; justify-content:space-between;">
+                    <div>
+                        <div style="font-size:11px; font-weight:700; color:{COLORS.PRIMARY_BLUE}; text-transform:uppercase; margin-bottom:4px;">Par 1 · Confronto Concorrencial</div>
+                        <div style="font-weight:700; font-size:14px; color:{COLORS.PRIMARY_NAVY}; margin-bottom:6px;">Allianz D&O × Chubb D&O</div>
+                        <p style="font-size:12px; color:{COLORS.TEXT_MUTED}; line-height:1.4; margin-bottom:12px;">
+                            Avalia a divergência entre seguradoras: confronto de <b>Limites Máximos de Garantia</b>, franquias e escopo de coberturas de custos de defesa.
+                        </p>
+                    </div>
+                </div>
+            """, unsafe_allow_html=True)
+            if st.button("Carregar Benchmark Allianz × Chubb", key="btn_bm_allianz_chubb", type="secondary"):
+                _process_preset_pair(
+                    "apolice_do_allianz.pdf",
+                    "apolice_do_chubb.pdf"
+                )
+
+        with col_bm2:
+            st.markdown(f"""
+                <div style="background:#F8FAFC; border:1px solid {COLORS.BORDER}; border-radius:6px; padding:14px; height:100%; display:flex; flex-direction:column; justify-content:space-between;">
+                    <div>
+                        <div style="font-size:11px; font-weight:700; color:{COLORS.SECONDARY_TEAL}; text-transform:uppercase; margin-bottom:4px;">Par 2 · Evolução Contratual</div>
+                        <div style="font-weight:700; font-size:14px; color:{COLORS.PRIMARY_NAVY}; margin-bottom:6px;">Allianz D&O × Endosso de Alteração</div>
+                        <p style="font-size:12px; color:{COLORS.TEXT_MUTED}; line-height:1.4; margin-bottom:12px;">
+                            Avalia alteração de apólice por endosso: aumento de LMG para <b>R$ 30.000.000,00</b> e extensão do período de retroatividade.
+                        </p>
+                    </div>
+                </div>
+            """, unsafe_allow_html=True)
+            if st.button("Carregar Benchmark Allianz × Endosso", key="btn_bm_allianz_endosso", type="secondary"):
+                _process_preset_pair(
+                    "apolice_do_allianz.pdf",
+                    "apolice_do_allianz_endosso.pdf"
+                )
 
     st.markdown("</div>", unsafe_allow_html=True)
 
@@ -559,10 +599,15 @@ def _process_uploaded_pair(file_a, file_b):
 def _process_preset_pair(filename_a: str, filename_b: str):
     """Carrega e estrutura o par de benchmark oficial sem necessidade de upload externo."""
     path_a = DATASET_DO_DIR / filename_a
+    if not path_a.exists():
+        path_a = SAMPLE_POLICIES_DIR / filename_a
+
     path_b = DATASET_DO_DIR / filename_b
+    if not path_b.exists():
+        path_b = SAMPLE_POLICIES_DIR / filename_b
 
     if not path_a.exists() or not path_b.exists():
-        st.error(f"Arquivos do benchmark oficial não foram localizados: {filename_a} / {filename_b}")
+        st.error(f"Arquivos do benchmark não foram localizados: {filename_a} / {filename_b}")
         return
 
     checklist_placeholder = st.empty()

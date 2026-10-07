@@ -4,7 +4,7 @@ injeção de estilos Insurance Intelligence v1.0 e roteamento oficial.
 """
 import streamlit as st
 
-from core.config import GEMINI_MODEL, DB_PATH
+from core.config import GEMINI_MODEL, DB_PATH, get_secret_or_env
 from core.database import db
 from core.llm_client import llm_client
 from ui.styles import apply_custom_styles
@@ -117,7 +117,11 @@ def _render_settings_page():
                 </div>
             """, unsafe_allow_html=True)
 
-        current_key = llm_client.api_key if llm_client.api_key else ""
+        current_key = llm_client.api_key or get_secret_or_env("GOOGLE_API_KEY") or get_secret_or_env("GEMINI_API_KEY")
+        if not llm_client.is_available() and current_key:
+            llm_client.api_key = current_key
+            llm_client._initialize_client()
+
         api_key_input = st.text_input(
             "Google AI Studio API Key:",
             type="password",

@@ -64,7 +64,7 @@ class GeminiClient:
         if api_key is not None:
             self.api_key = api_key
         else:
-            self.api_key = GOOGLE_API_KEY or os.getenv("GOOGLE_API_KEY", "")
+            self.api_key = GOOGLE_API_KEY or os.getenv("GOOGLE_API_KEY", "") or os.getenv("GEMINI_API_KEY", "")
         self.client = None
         self.call_history: List[Dict[str, Any]] = []
         self.last_call_stats: Dict[str, Any] = {}

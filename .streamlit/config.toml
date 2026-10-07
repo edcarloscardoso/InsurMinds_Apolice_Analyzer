@@ -7,8 +7,6 @@ textColor = "#1F2A35"
 font = "sans serif"
 
 [server]
-address = "0.0.0.0"
-port = 8503
 headless = true
 enableCORS = false
 enableXsrfProtection = true
